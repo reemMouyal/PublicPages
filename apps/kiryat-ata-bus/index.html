@@ -1,0 +1,54 @@
+---
+app_catalog: true
+title: "מעקב אוטובוסים | קווים 80 ו־80א"
+summary: "מפת הקווים מקריית אתא לקריית שמואל, תחנות איסוף והמלצה להורדה בבוקר."
+thumbnail: "screenshots/decision.jpg"
+thumbnail_alt: "המלצה לתחנת איסוף במצב הדגמה"
+---
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>מעקב קווים 80 ו־80א | קריית אתא</title>
+  <meta name="description" content="מפת קווי אגד 80 ו־80א, תחנות והמלצת הורדה מקריית אתא לקריית שמואל.">
+  <style>
+    body{margin:0;background:#f1f5ff;color:#13254a;font:1.1rem/1.65 system-ui,sans-serif}
+    main{max-width:66rem;margin:auto;padding:clamp(1.25rem,5vw,3.5rem) 1rem}
+    header,figure{background:white;border:1px solid #d9e3fa;border-radius:1rem}
+    header{padding:clamp(1.25rem,4vw,2.5rem);margin-block:1rem 2rem}
+    h1{line-height:1.15;margin:0;font-size:clamp(2rem,6vw,3.5rem)} h2{margin-block:0 .5rem}
+    a{color:#15469a} a:focus-visible{outline:3px solid currentColor;outline-offset:4px}
+    .launch{display:inline-block;background:#15469a;color:white;text-decoration:none;font-weight:750;border-radius:.65rem;padding:.65rem 1.1rem}
+    .gallery{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,25rem),1fr))}
+    figure{margin:0;overflow:hidden} figure img{width:100%;height:auto;display:block}
+    figcaption{padding:.8rem 1rem} .note{color:#3c506e}
+  </style>
+</head>
+<body>
+  <main>
+    <nav aria-label="ניווט"><a href="../../">חזרה לכל האפליקציות</a></nav>
+    <header>
+      <h1>מעקב קווים <bdi>80</bdi> ו־80א</h1>
+      <p>כלי לתושבי קריית אתא שנוסעים לקריית שמואל בחיפה, ולהורים שרוצים לבחור תחנת איסוף להורדת הילדים בבוקר.</p>
+      <a class="launch" href="./play.html">פתיחת האפליקציה</a>
+    </header>
+    <section aria-labelledby="how">
+      <h2 id="how">איך משתמשים?</h2>
+      <ol>
+        <li>בחרו קו 80, קו 80א, או הציגו את שניהם יחד.</li>
+        <li>בדקו את המפה, את רשימת התחנות ואת ההמלצה לתחנת איסוף. אפשר לפתוח ניווט לתחנה ב־Waze או ב־Google Maps.</li>
+        <li>בחרו ״הדגמה (08:00)״ כדי להכיר את המסך גם כשאין דיווחי מיקום.</li>
+      </ol>
+      <p class="note">מצב זמן אמת תלוי בזמינות ובטריות הדיווחים של Open Bus Stride. מצב ההדגמה מציג תרחיש לדוגמה.</p>
+    </section>
+    <section aria-labelledby="screens">
+      <h2 id="screens">מתוך האפליקציה</h2>
+      <div class="gallery">
+        <figure><img src="./screenshots/decision.jpg" alt="כרטיס המלצה לתחנת איסוף עם מידע לשני הקווים" loading="lazy"><figcaption>המלצה לתחנה במצב הדגמה</figcaption></figure>
+        <figure><img src="./screenshots/map.jpg" alt="מפת מסלול האוטובוסים ותחנות האיסוף בקריית אתא" loading="lazy"><figcaption>מפת המסלול והתחנות במצב הדגמה</figcaption></figure>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
