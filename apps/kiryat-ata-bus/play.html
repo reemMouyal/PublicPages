@@ -1403,10 +1403,10 @@
         const toIso = new Date(now.getTime() + 5 * 60 * 1000).toISOString();
         const bbox = "lat__greater_or_equal=32.790&lat__lower_or_equal=32.835&lon__greater_or_equal=35.060&lon__lower_or_equal=35.125";
 
-        const refsToQuery = refs.length > 0 ? refs.slice(0, 4) : [null];
+        const refsToQuery = refs.slice(0, 4);
         const batches = await Promise.all(
           refsToQuery.map(async (ref) => {
-            const lineParam = ref ? `&siri_routes__line_ref=${encodeURIComponent(ref)}` : "";
+            const lineParam = `&siri_routes__line_ref=${encodeURIComponent(ref)}`;
             const locUrl = `${STRIDE_BASE}/siri_vehicle_locations/list?${bbox}&recorded_at_time_from=${encodeURIComponent(fromIso)}&recorded_at_time_to=${encodeURIComponent(toIso)}&siri_routes__operator_ref=3${lineParam}&order_by=recorded_at_time%20desc&limit=30`;
             const res = await fetch(locUrl);
             if (!res.ok) throw new Error(`Stride HTTP ${res.status}`);
