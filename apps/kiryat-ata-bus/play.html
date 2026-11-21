@@ -1,0 +1,1730 @@
+﻿<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="קו 80 קרית אתא" />
+  <title>קו 80 / 80א קרית אתא — מעקב אוטובוס לתושבי הקריה</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <style>
+    body {
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    #map {
+      height: 390px;
+      width: 100%;
+      z-index: 1;
+    }
+    @media (min-width: 1024px) {
+      #map {
+        height: 490px;
+      }
+    }
+    .bus-pin-wrap {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      filter: drop-shadow(0 6px 10px rgba(15, 23, 42, 0.45));
+    }
+    .bus-pin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 12px;
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 13px;
+      line-height: 1;
+      white-space: nowrap;
+      border: 2.5px solid #facc15;
+    }
+    .bus-pin-80 {
+      background: #0f172a;
+      animation: busGlow80 1.8s infinite;
+    }
+    .bus-pin-80a {
+      background: #4c1d95;
+      animation: busGlow80a 1.8s infinite;
+    }
+    .bus-pin-arrow {
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 10px solid #facc15;
+      margin-top: -1px;
+    }
+    @keyframes busGlow80 {
+      0% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.75); }
+      70% { box-shadow: 0 0 0 14px rgba(250, 204, 21, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0); }
+    }
+    @keyframes busGlow80a {
+      0% { box-shadow: 0 0 0 0 rgba(196, 181, 253, 0.8); }
+      70% { box-shadow: 0 0 0 14px rgba(196, 181, 253, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(196, 181, 253, 0); }
+    }
+    .stop-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 9999px;
+      border: 2.5px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+    }
+    .leaflet-popup-content-wrapper {
+      direction: rtl;
+      text-align: right;
+      border-radius: 12px;
+    }
+    .stops-scroll {
+      max-height: 490px;
+      overflow-y: auto;
+    }
+    .stops-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .stops-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="min-h-screen antialiased">
+  <!-- Push Alert Toast Container -->
+  <div id="pushToastContainer" class="fixed bottom-4 left-4 right-4 sm:right-auto sm:w-96 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- Header -->
+  <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-md">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div id="headerLineBadge" class="px-2.5 h-11 min-w-[44px] rounded-xl bg-emerald-500 text-slate-950 font-black text-lg flex items-center justify-center shadow-sm">
+          80
+        </div>
+        <div>
+          <h1 id="headerTitle" class="text-base sm:text-lg font-bold leading-tight">מעקב חי קווים 80 / 80א — אגד</h1>
+          <p class="text-xs text-slate-300">קרית אתא ← קריית שמואל, חיפה • החלטת הורדה מהירה</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Line Selector -->
+        <div class="inline-flex rounded-xl bg-slate-800 p-1 border border-slate-700" role="group" aria-label="בחירת קו">
+          <button id="btnLine80" type="button" class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition bg-blue-600 text-white">
+            קו 80
+          </button>
+          <button id="btnLine80a" type="button" class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition text-slate-300 hover:text-white">
+            קו 80א
+          </button>
+          <button id="btnLineBoth" type="button" class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition text-slate-300 hover:text-white">
+            שניהם
+          </button>
+        </div>
+
+        <!-- Mode Selector -->
+        <div class="inline-flex rounded-xl bg-slate-800 p-1 border border-slate-700" role="group" aria-label="מצב הפעלה">
+          <button id="btnModeLive" type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-emerald-500 text-slate-950">
+            <span class="w-2 h-2 rounded-full bg-slate-950 animate-pulse"></span>
+            זמן אמת
+          </button>
+          <button id="btnModeSim" type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-300 hover:text-white">
+            הדגמה (08:00)
+          </button>
+        </div>
+
+        <button id="btnRefresh" type="button" class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 transition text-xs font-bold flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+          <span>רענן</span>
+        </button>
+
+        <button id="btnShareApp" type="button" class="px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 transition text-slate-950 text-xs font-extrabold flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+          <span>שתף</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-4 space-y-4">
+    <!-- Community Welcome Banner for Kiryat Ata Residents -->
+    <section id="welcomeBanner" class="rounded-2xl bg-gradient-to-l from-slate-900 via-slate-800 to-blue-950 text-white px-4 py-3.5 shadow-sm flex items-start justify-between gap-3">
+      <div class="space-y-1">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="px-2 py-0.5 rounded-full bg-emerald-400 text-slate-950 text-[11px] font-black">לשירות תושבי קרית אתא</span>
+          <span class="text-sm sm:text-base font-extrabold">בוקר רגוע יותר עם קווים 80 ו-80א לחיפה</span>
+        </div>
+        <p class="text-xs text-slate-200 leading-relaxed">
+          בדקו במבט אחד איפה האוטובוס נמצא בקריה, קבלו המלצה לאיזו תחנה להוריד את הילדים, סמנו 🔔 ליד התחנות שלכם לקבלת התראת הגעה ונווטו ישר ב-Waze. מומלץ להוסיף למסך הבית בנייד!
+        </p>
+      </div>
+      <button id="btnDismissWelcome" type="button" aria-label="סגור הודעת פתיחה" class="text-slate-300 hover:text-white text-sm font-bold px-2 py-1 rounded-lg shrink-0">✕</button>
+    </section>
+
+    <!-- Top Decision Banner -->
+    <section id="decisionCard" class="rounded-2xl border-2 border-emerald-200 bg-white shadow-sm overflow-hidden transition-colors">
+      <div id="decisionHeader" class="px-4 py-3 bg-emerald-50 border-b border-emerald-100 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span id="zoneBadge" class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-600 text-white">טוען נתונים...</span>
+          <span id="freshnessText" class="text-xs font-medium text-slate-600">מתחבר ל-Open Bus Stride API...</span>
+        </div>
+        <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer select-none">
+          <input id="toggleAutoRefresh" type="checkbox" checked class="w-4 h-4 accent-blue-600 rounded" />
+          <span>רענון אוטומטי (15 שנ')</span>
+        </label>
+      </div>
+
+      <div class="p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+        <!-- Current Bus Position(s) -->
+        <div class="lg:col-span-5 space-y-1.5">
+          <div id="busPositionLabel" class="text-xs font-bold uppercase tracking-wide text-slate-500">מיקום האוטובוס כרגע</div>
+          <div id="busStopTitle" class="text-xl sm:text-2xl font-black text-slate-900 leading-snug">מאתר את קו 80...</div>
+          <div id="busStopMeta" class="text-xs sm:text-sm text-slate-600 flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span>טוען תחנות...</span>
+          </div>
+          <!-- Dual-line quick summary strip (shown in Both mode) -->
+          <div id="dualLineStrip" class="hidden pt-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div id="dualCard80" class="rounded-xl border border-blue-200 bg-blue-50/70 px-2.5 py-2 text-xs">
+              <div class="font-extrabold text-blue-700">קו 80 (זבולון)</div>
+              <div id="dualText80" class="text-slate-700 font-semibold truncate">—</div>
+            </div>
+            <div id="dualCard80a" class="rounded-xl border border-violet-200 bg-violet-50/70 px-2.5 py-2 text-xs">
+              <div class="font-extrabold text-violet-700">קו 80א (העצמאות/חנקין)</div>
+              <div id="dualText80a" class="text-slate-700 font-semibold truncate">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recommendation -->
+        <div class="lg:col-span-4 rounded-xl bg-slate-50 border border-slate-200 p-3 space-y-1">
+          <div class="flex items-center justify-between gap-2">
+            <span id="targetLabel" class="text-xs font-bold text-emerald-700">תחנת יעד מומלצת להורדה</span>
+            <button id="btnResetTarget" type="button" class="hidden text-xs font-semibold text-blue-600 hover:underline">חזור להמלצה</button>
+          </div>
+          <div id="recommendedStopName" class="text-base font-extrabold text-slate-900">—</div>
+          <p id="strategyAdvice" class="text-xs text-slate-600 leading-relaxed">בודק איפה הקו נמצא כדי להמליץ על נקודת ההורדה הטובה ביותר.</p>
+        </div>
+
+        <!-- One-Tap Navigation -->
+        <div class="lg:col-span-3 flex flex-row lg:flex-col gap-2">
+          <a id="btnWaze" href="https://waze.com/ul?ll=32.805372,35.102755&navigate=yes" target="_blank" rel="noopener noreferrer"
+             class="flex-1 px-3 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition">
+            <i data-lucide="navigation" class="w-4 h-4"></i>
+            <span>נווט ב-Waze לתחנה</span>
+          </a>
+          <a id="btnGmaps" href="https://www.google.com/maps/dir/?api=1&destination=32.805372,35.102755" target="_blank" rel="noopener noreferrer"
+             class="flex-1 px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition">
+            <i data-lucide="map-pin" class="w-4 h-4"></i>
+            <span>Google Maps</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Live Fallback Notice -->
+      <div id="liveNoticeBar" class="hidden px-4 py-2.5 bg-amber-50 border-t border-amber-200 flex flex-wrap items-center justify-between gap-2 text-xs text-amber-900">
+        <div class="flex items-center gap-2">
+          <i data-lucide="info" class="w-4 h-4 text-amber-600 shrink-0"></i>
+          <span id="liveNoticeText">לא נקלט שידור GPS פעיל ב-20 הדקות האחרונות (ייתכן שאין נסיעה פעילה כרגע).</span>
+        </div>
+        <button id="btnQuickSim" type="button" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold transition">
+          נסה מצב סימולציה לבוקר
+        </button>
+      </div>
+    </section>
+
+    <!-- Simulation Controls -->
+    <section id="simPanel" class="hidden rounded-2xl bg-indigo-50 border border-indigo-200 p-4 space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="px-2 py-0.5 rounded-md bg-indigo-600 text-white text-xs font-bold">סימולציה</span>
+          <span id="simSubtitle" class="text-sm font-bold text-indigo-950">בדוק איך המסך וההתראות עובדים כשהאוטובוס מתקדם</span>
+        </div>
+        <button id="btnSimPlay" type="button" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center gap-1.5 transition">
+          <i data-lucide="play" class="w-3.5 h-3.5"></i>
+          <span id="simPlayLabel">הפעל תנועה</span>
+        </button>
+      </div>
+
+      <div id="simPresetsRow" class="flex flex-wrap items-center gap-2">
+        <button type="button" data-sim-preset="start" class="sim-preset-btn px-3 py-1.5 rounded-lg bg-white border border-indigo-200 hover:border-indigo-400 text-xs font-bold text-slate-800 transition">
+          תחילת מסלול
+        </button>
+        <button type="button" data-sim-preset="mid" class="sim-preset-btn px-3 py-1.5 rounded-lg bg-white border border-indigo-200 hover:border-indigo-400 text-xs font-bold text-slate-800 transition">
+          אמצע קרית אתא
+        </button>
+        <button type="button" data-sim-preset="late" class="sim-preset-btn px-3 py-1.5 rounded-lg bg-white border border-indigo-200 hover:border-indigo-400 text-xs font-bold text-slate-800 transition">
+          לקראת יציאה
+        </button>
+        <button type="button" data-sim-preset="junction" class="sim-preset-btn px-3 py-1.5 rounded-lg bg-white border border-indigo-200 hover:border-indigo-400 text-xs font-bold text-slate-800 transition">
+          בצומת לכיוון חיפה
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div id="simSliderWrap80" class="flex items-center gap-2.5 bg-white/80 rounded-xl px-3 py-2 border border-indigo-100">
+          <span class="px-2 py-0.5 rounded bg-blue-600 text-white text-[11px] font-extrabold shrink-0">80</span>
+          <input id="simSlider80" type="range" min="0" max="15" value="2" step="1" class="w-full accent-blue-600 cursor-pointer" />
+          <span id="simVal80" class="text-xs font-bold text-slate-700 whitespace-nowrap">3/16</span>
+        </div>
+        <div id="simSliderWrap80a" class="hidden flex items-center gap-2.5 bg-white/80 rounded-xl px-3 py-2 border border-indigo-100">
+          <span class="px-2 py-0.5 rounded bg-violet-600 text-white text-[11px] font-extrabold shrink-0">80א</span>
+          <input id="simSlider80a" type="range" min="0" max="7" value="1" step="1" class="w-full accent-violet-600 cursor-pointer" />
+          <span id="simVal80a" class="text-xs font-bold text-slate-700 whitespace-nowrap">2/8</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Grid: Map + Stop-by-Stop Strip -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <!-- Map Column -->
+      <section class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+        <div class="px-4 py-2.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <i data-lucide="map" class="w-4 h-4 text-blue-600"></i>
+            <h2 class="text-sm font-bold text-slate-900">מפת המסלול בקרית אתא והיציאה לחיפה</h2>
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button id="btnToggleHistory" type="button" class="px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-xs font-bold transition">
+              היסטוריית GPS (פעיל)
+            </button>
+            <button id="btnFocusBus" type="button" class="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold transition">
+              התמקד באוטובוס
+            </button>
+            <button id="btnFitRoute" type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+              כל המסלול
+            </button>
+            <button id="btnLockMap" type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+              נעל מפה לגלילה
+            </button>
+          </div>
+        </div>
+
+        <div id="mapGeometryBar" class="px-4 py-1.5 bg-slate-50 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-600">
+          <span id="roadSnapStatus" class="font-semibold text-slate-700">מחשב תוואי כבישים אמיתי (OSRM)...</span>
+          <span id="historyTrackStatus" class="font-semibold text-amber-800">טוען מסלול GPS היסטורי (08:00) מ-Stride...</span>
+        </div>
+
+        <div class="relative flex items-stretch bg-slate-100">
+          <!-- Right Side Scroll Rail (thumb zone in RTL) -->
+          <div class="w-8 sm:w-9 shrink-0 bg-slate-100 border-l border-slate-200 flex flex-col items-center justify-center gap-1 select-none text-slate-400" style="touch-action: pan-y;" title="אזור גלילה בטוח למעלה ולמטה">
+            <span class="text-xs font-bold leading-none">▲</span>
+            <span class="w-1 h-10 rounded-full bg-slate-300"></span>
+            <span class="text-[9px] font-bold text-slate-500 [writing-mode:vertical-rl]">גלילה</span>
+            <span class="w-1 h-10 rounded-full bg-slate-300"></span>
+            <span class="text-xs font-bold leading-none">▼</span>
+          </div>
+
+          <!-- Map Container -->
+          <div class="relative flex-1 min-w-0">
+            <div id="map"></div>
+            <div id="mapLockOverlay" class="hidden absolute inset-0 z-20 bg-slate-900/5" style="touch-action: pan-y;"></div>
+          </div>
+
+          <!-- Left Side Scroll Rail (for left-hand thumb scrolling) -->
+          <div class="w-7 sm:w-8 shrink-0 bg-slate-100 border-r border-slate-200 flex flex-col items-center justify-center gap-1 select-none text-slate-400" style="touch-action: pan-y;" title="אזור גלילה בטוח למעלה ולמטה">
+            <span class="text-xs font-bold leading-none">▲</span>
+            <span class="w-1 h-12 rounded-full bg-slate-300"></span>
+            <span class="text-xs font-bold leading-none">▼</span>
+          </div>
+        </div>
+
+        <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
+          <div class="flex flex-wrap items-center gap-3">
+            <span class="inline-flex items-center gap-1.5"><span class="px-1.5 py-0.5 rounded bg-slate-900 border border-yellow-400 text-white text-[10px] font-black">🚌 קו 80</span></span>
+            <span class="inline-flex items-center gap-1.5"><span class="px-1.5 py-0.5 rounded bg-violet-900 border border-yellow-400 text-white text-[10px] font-black">🚌 קו 80א</span></span>
+            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-600 inline-block"></span>יעד להורדה</span>
+            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>מסלול GPS היסטורי</span>
+            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-slate-400 inline-block"></span>כבר עבר</span>
+          </div>
+          <span class="text-[11px] text-slate-500">לחץ על כל תחנה כדי לבחור יעד ניווט</span>
+        </div>
+      </section>
+
+      <!-- Stops Timeline Column -->
+      <section class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+        <div class="px-4 py-2.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <i data-lucide="list-ordered" class="w-4 h-4 text-emerald-600"></i>
+            <h2 id="stopsListHeading" class="text-sm font-bold text-slate-900">תחנות איסוף — קו 80</h2>
+          </div>
+          <span id="stopsRemainingBadge" class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">—</span>
+        </div>
+
+        <!-- List Sub-filter (Visible in Both mode) -->
+        <div id="bothListFilterBar" class="hidden px-3 py-2 bg-slate-50 border-b border-slate-100 flex items-center gap-1.5">
+          <button type="button" data-list-filter="both" class="list-filter-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-900 text-white transition">הכל (24)</button>
+          <button type="button" data-list-filter="80" class="list-filter-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-white border border-slate-200 text-slate-700 transition">קו 80 (16)</button>
+          <button type="button" data-list-filter="80א" class="list-filter-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-white border border-slate-200 text-slate-700 transition">קו 80א (8)</button>
+        </div>
+
+        <!-- Push Alerts Bar -->
+        <div class="px-3 py-2.5 bg-amber-50/80 border-b border-amber-100 space-y-2">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5 text-xs font-bold text-amber-950">
+              <i data-lucide="bell-ring" class="w-3.5 h-3.5 text-amber-600"></i>
+              <span>התראות פוש בהגעה לתחנה</span>
+              <span id="alertCountBadge" class="px-2 py-0.5 rounded-full bg-amber-200 text-amber-950 text-[11px] font-extrabold">0 נבחרו</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button id="btnEnablePush" type="button" class="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold transition">
+                אשר פוש בדפדפן
+              </button>
+              <button id="btnTestPush" type="button" class="px-2 py-1 rounded-lg bg-white border border-amber-300 hover:bg-amber-100 text-amber-900 text-[11px] font-bold transition">
+                בדוק
+              </button>
+              <button id="btnClearAlerts" type="button" class="hidden px-2 py-1 rounded-lg text-[11px] font-bold text-slate-600 hover:text-rose-600 transition">
+                נקה
+              </button>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-amber-900/80">
+            <span>לחץ על הפעמון ליד כל תחנה (ב-80 או ב-80א) לקבלת התראה</span>
+            <label class="inline-flex items-center gap-1.5 font-semibold text-amber-950 cursor-pointer select-none">
+              <input id="toggleAlertSound" type="checkbox" checked class="w-3.5 h-3.5 accent-amber-600 rounded" />
+              <span>צליל התראה</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="stopsList" class="stops-scroll divide-y divide-slate-100 p-2 space-y-1">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer / Data Source Note -->
+    <footer class="rounded-xl bg-white border border-slate-200 px-4 py-3 text-xs text-slate-500 flex flex-wrap items-center justify-between gap-2">
+      <div>
+        מקור מיקום חי: <a href="https://open-bus-stride-api.hasadna.org.il/docs" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-semibold">Open Bus Stride API (הסדנא לידע ציבורי)</a> •
+        מסלולים (אגד):
+        <a href="https://busnearby.co.il/%D7%A7%D7%95%D7%95%D7%99%D7%9D/%D7%9E%D7%A7%D7%A8%D7%99%D7%AA%20%D7%90%D7%AA%D7%90%20%D7%9C%D7%97%D7%99%D7%A4%D7%94/%D7%90%D7%92%D7%93/80/%D7%9C%D7%9B%D7%99%D7%95%D7%95%D7%9F%20%D7%A7%D7%A8%D7%99%D7%99%D7%AA%20%D7%A9%D7%9E%D7%95%D7%90%D7%9C/3935/3802" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-semibold">קו 80</a> |
+        <a href="https://busnearby.co.il/%D7%A7%D7%95%D7%95%D7%99%D7%9D/%D7%9E%D7%A7%D7%A8%D7%99%D7%AA%20%D7%90%D7%AA%D7%90%20%D7%9C%D7%97%D7%99%D7%A4%D7%94/%D7%90%D7%92%D7%93/80%D7%90/%D7%9C%D7%9B%D7%99%D7%95%D7%95%D7%9F%20%D7%A7%D7%A8%D7%99%D7%99%D7%AA%20%D7%A9%D7%9E%D7%95%D7%90%D7%9C/3936/3802" target="_blank" rel="noopener noreferrer" class="text-violet-600 hover:underline font-semibold">קו 80א</a>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-[11px] text-slate-400">גרסה רשמית לקהילת קרית אתא • ייתכן עיכוב קל בשידור ה-GPS מהמקור</span>
+        <span id="apiMetaFooter" class="font-mono text-[11px] text-slate-400">ממתין לשאילתה...</span>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    (function () {
+      // Verified Egged Line 80 & Line 80א stops (Kiryat Ata -> Kiryat Shmuel, Haifa)
+      const LINES = {
+        "80": {
+          id: "80",
+          label: "קו 80",
+          corridor: "כצנלסון • רמז • זבולון • צומת קרית אתא",
+          color: "#2563eb",
+          pulseClass: "bus-pin-80",
+          stops: [
+            { idx: 0, code: "42356", name: "כצנלסון/הנביאים", address: "שדרות כצנלסון 47, קרית אתא", lat: 32.800762, lng: 35.106289, zone: "start" },
+            { idx: 1, code: "41747", name: "כצנלסון/ירושלים", address: "שדרות כצנלסון 23, קרית אתא", lat: 32.802714, lng: 35.107686, zone: "start" },
+            { idx: 2, code: "41599", name: "רמז/ארלוזורוב", address: "דוד רמז 6, קרית אתא", lat: 32.805504, lng: 35.109614, zone: "start" },
+            { idx: 3, code: "42854", name: "רמז/בית רבין", address: "דוד רמז 11, קרית אתא", lat: 32.806817, lng: 35.110618, zone: "start" },
+            { idx: 4, code: "41601", name: "רמז/הציונות", address: "דוד רמז 5, קרית אתא", lat: 32.805787, lng: 35.109703, zone: "start" },
+            { idx: 5, code: "42717", name: "הציונות/נורדאו", address: "שדרות הציונות 11, קרית אתא", lat: 32.806288, lng: 35.106321, zone: "mid" },
+            { idx: 6, code: "43058", name: "זבולון/מרכז קרית אתא", address: "זבולון 10, קרית אתא", lat: 32.805372, lng: 35.102755, zone: "mid" },
+            { idx: 7, code: "40507", name: "זבולון/התעלה", address: "זבולון 38, קרית אתא", lat: 32.804671, lng: 35.098670, zone: "mid" },
+            { idx: 8, code: "40509", name: "זבולון/שיבת ציון", address: "זבולון 98, קרית אתא", lat: 32.803975, lng: 35.094417, zone: "mid" },
+            { idx: 9, code: "43048", name: "זבולון/משה שרת", address: "זבולון 126, קרית אתא", lat: 32.803593, lng: 35.091442, zone: "mid" },
+            { idx: 10, code: "43046", name: "זבולון/נווה חן", address: "זבולון 154, קרית אתא", lat: 32.803198, lng: 35.085213, zone: "late" },
+            { idx: 11, code: "40512", name: "זבולון/אנדרטת לחי", address: "זבולון 174, קרית אתא", lat: 32.802626, lng: 35.080675, zone: "late" },
+            { idx: 12, code: "43056", name: "דרך חיפה/זבולון", address: "דרך חיפה 2, קרית אתא", lat: 32.803193, lng: 35.075884, zone: "late" },
+            { idx: 13, code: "43054", name: "דרך חיפה", address: "דרך חיפה 46, קרית אתא", lat: 32.806636, lng: 35.074020, zone: "late" },
+            { idx: 14, code: "43069", name: "דרך הדשנים/צומת קרית אתא", address: "הדשנים 5, חיפה", lat: 32.810123, lng: 35.070699, zone: "junction" },
+            { idx: 15, code: "41296", name: "ההסתדרות/צומת קרית אתא", address: "שדרות ההסתדרות 252, חיפה", lat: 32.811661, lng: 35.071139, zone: "junction" }
+          ]
+        },
+        "80א": {
+          id: "80א",
+          label: "קו 80א",
+          corridor: "העצמאות • המגינים • חנקין • איינשטיין • י.ל. פרץ • צומת קרית חיים",
+          color: "#7c3aed",
+          pulseClass: "bus-pin-80a",
+          stops: [
+            { idx: 0, code: "43060", name: "קופת חולים/העצמאות", address: "העצמאות 105, קרית אתא", lat: 32.811370, lng: 35.104583, zone: "start" },
+            { idx: 1, code: "42715", name: "המגינים/פינסקר", address: "שדרות המגינים 12, קרית אתא", lat: 32.808899, lng: 35.106349, zone: "start" },
+            { idx: 2, code: "42097", name: "חנקין/רופין", address: "חנקין 14, קרית אתא", lat: 32.812117, lng: 35.108071, zone: "mid" },
+            { idx: 3, code: "41350", name: "הרצל/חנקין", address: "הרצל 66, קרית אתא", lat: 32.811648, lng: 35.110927, zone: "mid" },
+            { idx: 4, code: "41356", name: "איינשטיין/הצנחנים", address: "איינשטיין 4, קרית אתא", lat: 32.812757, lng: 35.112790, zone: "late" },
+            { idx: 5, code: "40377", name: "י.ל. פרץ/פרישמן (תחנה אחרונה בקרית אתא)", address: "י.ל. פרץ 22, קרית אתא", lat: null, lng: null, zone: "late" },
+            { idx: 6, code: "42860", name: "אחי אילת/צומת קרית חיים", address: "שדרות אח\"י אילת 66, חיפה", lat: 32.817850, lng: 35.076978, zone: "junction" },
+            { idx: 7, code: "42861", name: "ביטוח לאומי/אחי אילת", address: "שדרות אח\"י אילת 50, חיפה", lat: 32.819002, lng: 35.074706, zone: "junction" }
+          ]
+        }
+      };
+
+      const STRIDE_BASE = "https://open-bus-stride-api.hasadna.org.il";
+
+      const state = {
+        selectedLine: "both", // "80" | "80א" | "both"
+        listFilter: "both",   // "both" | "80" | "80א" (used when selectedLine === "both")
+        mode: "live",         // "live" | "sim"
+        autoRefresh: true,
+        liveData: {
+          "80": { busIndex: null, latLng: null, recordedAt: null, distMeters: null, lineRefs: [] },
+          "80א": { busIndex: null, latLng: null, recordedAt: null, distMeters: null, lineRefs: [] }
+        },
+        simIndex: { "80": 2, "80א": 1 },
+        customTarget: null, // { lineId: "80"|"80א", idx: number } | null
+        simPlaying: false,
+        simTimer: null,
+        refreshTimer: null,
+        liveStatusMessage: "מתחבר ל-Open Bus Stride API...",
+        isFetching: false,
+        alertStops: new Set(["80:42356", "80:43058", "80א:43060", "80א:40377"]),
+        firedAlertStops: new Set(),
+        alertSound: true,
+        pushPermission: typeof Notification !== "undefined" ? Notification.permission : "unsupported",
+        showHistoryTrack: true,
+        mapLocked: false,
+        roadSnapped: { "80": false, "80א": false },
+        historyTracks: { "80": { points: [], date: null }, "80א": { points: [], date: null } }
+      };
+
+      try {
+        const saved = localStorage.getItem("bus80_multi_alert_stops");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            state.alertStops = new Set(parsed.filter((k) => typeof k === "string" && k.includes(":")));
+          }
+        }
+      } catch (e) {}
+
+      function saveAlertStops() {
+        try {
+          localStorage.setItem("bus80_multi_alert_stops", JSON.stringify([...state.alertStops]));
+        } catch (e) {}
+      }
+
+      // DOM refs
+      const headerLineBadge = document.getElementById("headerLineBadge");
+      const headerTitle = document.getElementById("headerTitle");
+      const btnLine80 = document.getElementById("btnLine80");
+      const btnLine80a = document.getElementById("btnLine80a");
+      const btnLineBoth = document.getElementById("btnLineBoth");
+      const btnModeLive = document.getElementById("btnModeLive");
+      const btnModeSim = document.getElementById("btnModeSim");
+      const btnRefresh = document.getElementById("btnRefresh");
+      const btnShareApp = document.getElementById("btnShareApp");
+      const welcomeBanner = document.getElementById("welcomeBanner");
+      const btnDismissWelcome = document.getElementById("btnDismissWelcome");
+      const toggleAutoRefresh = document.getElementById("toggleAutoRefresh");
+      const decisionCard = document.getElementById("decisionCard");
+      const decisionHeader = document.getElementById("decisionHeader");
+      const zoneBadge = document.getElementById("zoneBadge");
+      const freshnessText = document.getElementById("freshnessText");
+      const busPositionLabel = document.getElementById("busPositionLabel");
+      const busStopTitle = document.getElementById("busStopTitle");
+      const busStopMeta = document.getElementById("busStopMeta");
+      const dualLineStrip = document.getElementById("dualLineStrip");
+      const dualText80 = document.getElementById("dualText80");
+      const dualText80a = document.getElementById("dualText80a");
+      const targetLabel = document.getElementById("targetLabel");
+      const btnResetTarget = document.getElementById("btnResetTarget");
+      const recommendedStopName = document.getElementById("recommendedStopName");
+      const strategyAdvice = document.getElementById("strategyAdvice");
+      const btnWaze = document.getElementById("btnWaze");
+      const btnGmaps = document.getElementById("btnGmaps");
+      const liveNoticeBar = document.getElementById("liveNoticeBar");
+      const liveNoticeText = document.getElementById("liveNoticeText");
+      const btnQuickSim = document.getElementById("btnQuickSim");
+      const simPanel = document.getElementById("simPanel");
+      const simSliderWrap80 = document.getElementById("simSliderWrap80");
+      const simSliderWrap80a = document.getElementById("simSliderWrap80a");
+      const simSlider80 = document.getElementById("simSlider80");
+      const simSlider80a = document.getElementById("simSlider80a");
+      const simVal80 = document.getElementById("simVal80");
+      const simVal80a = document.getElementById("simVal80a");
+      const btnSimPlay = document.getElementById("btnSimPlay");
+      const simPlayLabel = document.getElementById("simPlayLabel");
+      const btnToggleHistory = document.getElementById("btnToggleHistory");
+      const roadSnapStatus = document.getElementById("roadSnapStatus");
+      const historyTrackStatus = document.getElementById("historyTrackStatus");
+      const btnFocusBus = document.getElementById("btnFocusBus");
+      const btnFitRoute = document.getElementById("btnFitRoute");
+      const btnLockMap = document.getElementById("btnLockMap");
+      const mapLockOverlay = document.getElementById("mapLockOverlay");
+      const stopsListHeading = document.getElementById("stopsListHeading");
+      const bothListFilterBar = document.getElementById("bothListFilterBar");
+      const stopsList = document.getElementById("stopsList");
+      const stopsRemainingBadge = document.getElementById("stopsRemainingBadge");
+      const apiMetaFooter = document.getElementById("apiMetaFooter");
+      const pushToastContainer = document.getElementById("pushToastContainer");
+      const alertCountBadge = document.getElementById("alertCountBadge");
+      const btnEnablePush = document.getElementById("btnEnablePush");
+      const btnTestPush = document.getElementById("btnTestPush");
+      const btnClearAlerts = document.getElementById("btnClearAlerts");
+      const toggleAlertSound = document.getElementById("toggleAlertSound");
+
+      // Leaflet map initialization with keyless ArcGIS World Street Map tiles
+      const map = L.map("map", { zoomControl: true, scrollWheelZoom: false }).setView([32.808, 35.092], 13);
+      L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+        { maxZoom: 19, attribution: "Tiles &copy; Esri" }
+      ).addTo(map);
+
+      const routePolylines = {};
+      const historyLayers = { "80": L.layerGroup(), "80א": L.layerGroup() };
+      const stopMarkers = { "80": [], "80א": [] };
+      const busMarkers = { "80": null, "80א": null };
+
+      function getActiveLineIds() {
+        return state.selectedLine === "both" ? ["80", "80א"] : [state.selectedLine];
+      }
+
+      function haversineMeters(lat1, lon1, lat2, lon2) {
+        const R = 6371000;
+        const toRad = (d) => (d * Math.PI) / 180;
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      }
+
+      function findNearestStop(lineId, lat, lng) {
+        const stops = LINES[lineId].stops;
+        let bestIdx = 0;
+        let bestDist = Infinity;
+        for (let i = 0; i < stops.length; i++) {
+          if (stops[i].lat === null || stops[i].lng === null) continue;
+          const d = haversineMeters(lat, lng, stops[i].lat, stops[i].lng);
+          if (d < bestDist) {
+            bestDist = d;
+            bestIdx = i;
+          }
+        }
+        return { idx: bestIdx, distMeters: Math.round(bestDist) };
+      }
+
+      function getBusPosition(lineId) {
+        if (state.mode === "sim") {
+          const idx = state.simIndex[lineId];
+          const s = LINES[lineId].stops[idx];
+          const latLng = s.lat !== null && s.lng !== null ? [s.lat, s.lng] : null;
+          return { idx, latLng, recordedAt: null, distMeters: 0 };
+        }
+        const d = state.liveData[lineId];
+        return { idx: d.busIndex, latLng: d.latLng, recordedAt: d.recordedAt, distMeters: d.distMeters };
+      }
+
+      function computeLineRecommendation(lineId, busIdx) {
+        const stops = LINES[lineId].stops;
+        const lastIdx = stops.length - 1;
+        if (busIdx === null || busIdx === undefined) {
+          const fallbackIdx = lineId === "80" ? 6 : 2;
+          return {
+            lineId,
+            targetIdx: fallbackIdx,
+            priority: 99,
+            zoneText: "ממתין לשידור חי",
+            theme: "slate",
+            advice: `אין כרגע שידור פעיל עבור ${LINES[lineId].label}. מוצגת תחנה מרכזית כנקודת ייחוס.`
+          };
+        }
+        const zone = stops[busIdx].zone;
+        if (zone === "start") {
+          const targetIdx = Math.min(busIdx + 2, lastIdx - 1);
+          return {
+            lineId,
+            targetIdx,
+            priority: 1,
+            zoneText: `${LINES[lineId].label}: תחילת המסלול — יש זמן!`,
+            theme: "emerald",
+            advice: `${LINES[lineId].label} בתחילת המסלול בקרית אתא. הכי נוח להוריד את הילדים 1–2 תחנות לפניו בלי לחץ.`
+          };
+        }
+        if (zone === "mid") {
+          const stepAhead = lineId === "80" ? 3 : 2;
+          const targetIdx = Math.min(busIdx + stepAhead, lastIdx - 1);
+          return {
+            lineId,
+            targetIdx,
+            priority: 2,
+            zoneText: `${LINES[lineId].label}: אמצע קרית אתא`,
+            theme: "blue",
+            advice: `${LINES[lineId].label} כבר באמצע קרית אתא. הקדימו אותו ל-${stops[targetIdx].name}.`
+          };
+        }
+        if (zone === "late") {
+          const targetIdx = Math.min(busIdx + 1, lastIdx);
+          return {
+            lineId,
+            targetIdx,
+            priority: 3,
+            zoneText: `${LINES[lineId].label}: לקראת יציאה מקרית אתא`,
+            theme: "amber",
+            advice: `${LINES[lineId].label} מתקרב ליציאה מהעיר — מומלץ לכוון ישירות לתחנת היציאה / הצומת.`
+          };
+        }
+        return {
+          lineId,
+          targetIdx: lastIdx,
+          priority: 4,
+          zoneText: `${LINES[lineId].label}: כבר בצומת לכיוון חיפה!`,
+          theme: "rose",
+          advice: `${LINES[lineId].label} כבר יצא מקרית אתא לצומת — סיכוי אחרון בתחנת ${stops[lastIdx].name}.`
+        };
+      }
+
+      function computeOverallRecommendation() {
+        const activeIds = getActiveLineIds();
+        const recs = activeIds.map((id) => computeLineRecommendation(id, getBusPosition(id).idx));
+        recs.sort((a, b) => a.priority - b.priority);
+        return recs[0];
+      }
+
+      function formatAge(isoString) {
+        if (!isoString) return "";
+        const t = new Date(isoString).getTime();
+        if (Number.isNaN(t)) return "";
+        const diffSec = Math.max(0, Math.round((Date.now() - t) / 1000));
+        if (diffSec < 60) return `עודכן לפני ${diffSec} שנ'`;
+        const mins = Math.floor(diffSec / 60);
+        return `עודכן לפני ${mins} דק'`;
+      }
+
+      function buildStopIcon(num, bgColor, scale) {
+        const size = scale ? 28 : 24;
+        return L.divIcon({
+          className: "",
+          html: `<div class="stop-dot" style="background:${bgColor};width:${size}px;height:${size}px;">${num}</div>`,
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size / 2]
+        });
+      }
+
+      function buildBusIcon(lineId) {
+        const busSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg>`;
+        return L.divIcon({
+          className: "",
+          html: `<div class="bus-pin-wrap"><div class="bus-pin-badge ${LINES[lineId].pulseClass}">${busSvg}<span>קו ${lineId}</span></div><div class="bus-pin-arrow"></div></div>`,
+          iconSize: [86, 42],
+          iconAnchor: [43, 42]
+        });
+      }
+
+      function playAlertChime() {
+        if (!state.alertSound) return;
+        try {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return;
+          const ctx = new AudioCtx();
+          const now = ctx.currentTime;
+          [880, 1174.66].forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(freq, now + idx * 0.14);
+            gain.gain.setValueAtTime(0.18, now + idx * 0.14);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.14 + 0.28);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + idx * 0.14);
+            osc.stop(now + idx * 0.14 + 0.3);
+          });
+        } catch (e) {}
+      }
+
+      function showPushToast(title, body, stop) {
+        const toast = document.createElement("div");
+        toast.className = "pointer-events-auto rounded-2xl bg-slate-900 text-white border-2 border-amber-400 shadow-xl p-3.5 flex items-start justify-between gap-3";
+        const wazeUrl = stop
+          ? stop.lat !== null && stop.lng !== null
+            ? `https://waze.com/ul?ll=${stop.lat},${stop.lng}&navigate=yes`
+            : `https://waze.com/ul?q=${encodeURIComponent(stop.address)}&navigate=yes`
+          : "";
+        const navBtn = stop
+          ? `<a href="${wazeUrl}" target="_blank" rel="noopener noreferrer" class="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-sky-500 hover:bg-sky-400 text-white text-[11px] font-bold">נווט לתחנה ב-Waze</a>`
+          : "";
+        toast.innerHTML = `
+          <div class="space-y-0.5 min-w-0">
+            <div class="flex items-center gap-1.5 text-xs font-extrabold text-amber-400">
+              <span>🔔 התראת אוטובוס</span>
+            </div>
+            <div class="text-sm font-bold leading-snug">${title}</div>
+            <div class="text-xs text-slate-300">${body}</div>
+            ${navBtn}
+          </div>
+          <button type="button" class="toast-close text-slate-400 hover:text-white text-sm font-bold px-1.5 py-0.5 rounded-lg">✕</button>
+        `;
+        toast.querySelector(".toast-close").addEventListener("click", () => toast.remove());
+        pushToastContainer.prepend(toast);
+        setTimeout(() => {
+          if (toast.parentNode) toast.remove();
+        }, 9000);
+      }
+
+      function triggerStopPush(lineId, stop, isTest) {
+        const total = LINES[lineId].stops.length;
+        const title = isTest
+          ? `בדיקת התראה — ${LINES[lineId].label}: ${stop.name}`
+          : `${LINES[lineId].label} הגיע לתחנת ${stop.name}!`;
+        const body = isTest
+          ? `כך תיראה התראת הפוש כש${LINES[lineId].label} יגיע לתחנה ${stop.idx + 1} (${stop.code}).`
+          : `תחנה ${stop.idx + 1} מתוך ${total} • ${stop.address} (מק"ט ${stop.code})`;
+
+        playAlertChime();
+        showPushToast(title, body, stop);
+
+        if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+          try {
+            new Notification(title, { body, tag: `bus-${lineId}-${stop.code}` });
+          } catch (e) {}
+        }
+      }
+
+      function checkStopAlerts() {
+        getActiveLineIds().forEach((lineId) => {
+          const pos = getBusPosition(lineId);
+          if (pos.idx === null || pos.idx === undefined) return;
+          const stop = LINES[lineId].stops[pos.idx];
+          const key = `${lineId}:${stop.code}`;
+          if (state.alertStops.has(key) && !state.firedAlertStops.has(key)) {
+            state.firedAlertStops.add(key);
+            triggerStopPush(lineId, stop, false);
+          }
+        });
+      }
+
+      function updatePushUi() {
+        const count = state.alertStops.size;
+        alertCountBadge.textContent = count === 1 ? "תחנה 1 נבחרה" : `${count} נבחרו`;
+        if (count > 0) btnClearAlerts.classList.remove("hidden");
+        else btnClearAlerts.classList.add("hidden");
+
+        if (state.pushPermission === "granted") {
+          btnEnablePush.textContent = "פוש פעיל ✓";
+          btnEnablePush.className = "px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-[11px] font-bold transition";
+        } else if (state.pushPermission === "denied") {
+          btnEnablePush.textContent = "פוש חסום בדפדפן";
+          btnEnablePush.className = "px-2.5 py-1 rounded-lg bg-slate-400 text-white text-[11px] font-bold transition";
+        } else {
+          btnEnablePush.textContent = "אשר פוש בדפדפן";
+          btnEnablePush.className = "px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold transition";
+        }
+      }
+
+      function createStopMarker(lineId, stop) {
+        const line = LINES[lineId];
+        const m = L.marker([stop.lat, stop.lng], {
+          icon: buildStopIcon(stop.idx + 1, line.color, false)
+        });
+        m.bindPopup(
+          `<div class="text-xs space-y-1">
+            <div class="font-extrabold" style="color:${line.color}">${line.label} • תחנה ${stop.idx + 1}</div>
+            <div class="font-bold text-slate-900">${stop.name}</div>
+            <div class="text-slate-600">${stop.address}</div>
+            <div class="text-slate-500">מק"ט תחנה: ${stop.code}</div>
+          </div>`
+        );
+        m.on("click", () => {
+          state.customTarget = { lineId, idx: stop.idx };
+          render();
+        });
+        return m;
+      }
+
+      function initMapLayers() {
+        ["80", "80א"].forEach((lineId) => {
+          const line = LINES[lineId];
+          const validCoords = line.stops.filter((s) => s.lat !== null && s.lng !== null).map((s) => [s.lat, s.lng]);
+          routePolylines[lineId] = L.polyline(
+            validCoords,
+            { color: line.color, weight: 4, opacity: 0.45, dashArray: "6, 8" }
+          );
+          line.stops.forEach((stop) => {
+            if (stop.lat !== null && stop.lng !== null) {
+              stopMarkers[lineId].push(createStopMarker(lineId, stop));
+            } else {
+              stopMarkers[lineId].push(null);
+            }
+          });
+        });
+      }
+
+      // Hydrate exact official GTFS coordinates for stops without preloaded coords (e.g. 40377 י.ל. פרץ/פרישמן)
+      async function hydrateMissingStopCoords() {
+        for (const lineId of ["80", "80א"]) {
+          const stops = LINES[lineId].stops;
+          for (let i = 0; i < stops.length; i++) {
+            const stop = stops[i];
+            if (stop.lat !== null && stop.lng !== null) continue;
+            try {
+              const res = await fetch(`${STRIDE_BASE}/gtfs_stops/list?code=${encodeURIComponent(stop.code)}&limit=1`);
+              if (!res.ok) continue;
+              const rows = await res.json();
+              if (Array.isArray(rows) && rows[0] && rows[0].lat && rows[0].lon) {
+                stop.lat = Number(rows[0].lat);
+                stop.lng = Number(rows[0].lon);
+                stopMarkers[lineId][i] = createStopMarker(lineId, stop);
+              }
+            } catch (e) {}
+          }
+        }
+        render();
+      }
+
+      // Snap route polylines onto real streets & highways using public OSRM driving router
+      async function loadRoadGeometry(lineId) {
+        const stops = LINES[lineId].stops.filter((s) => s.lat !== null && s.lng !== null);
+        if (stops.length < 2) return;
+        const coordsStr = stops.map((s) => `${s.lng},${s.lat}`).join(";");
+        const url = `https://router.project-osrm.org/route/v1/driving/${coordsStr}?overview=full&geometries=geojson`;
+        try {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`OSRM ${res.status}`);
+          const data = await res.json();
+          if (data.routes && data.routes[0] && data.routes[0].geometry && Array.isArray(data.routes[0].geometry.coordinates)) {
+            const latLngs = data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+            routePolylines[lineId].setLatLngs(latLngs);
+            routePolylines[lineId].setStyle({
+              color: LINES[lineId].color,
+              weight: 5,
+              opacity: 0.85,
+              dashArray: null
+            });
+            state.roadSnapped[lineId] = true;
+            updateGeometryStatusUi();
+          }
+        } catch (e) {
+          updateGeometryStatusUi();
+        }
+      }
+
+      // Fetch real historical morning SIRI GPS trail (07:30-09:15 on most recent Sun-Thu) from Open Bus Stride API
+      function getRecentWeekdayDates(count) {
+        const dates = [];
+        const d = new Date();
+        d.setDate(d.getDate() - 1);
+        while (dates.length < count) {
+          const dow = d.getDay(); // 0=Sun..4=Thu
+          if (dow >= 0 && dow <= 4) {
+            dates.push(d.toISOString().slice(0, 10));
+          }
+          d.setDate(d.getDate() - 1);
+        }
+        return dates;
+      }
+
+      async function loadHistoricalGpsTrack(lineId) {
+        try {
+          const refs = await resolveLineRefs(lineId);
+          if (!refs || refs.length === 0) return;
+          const candidateDates = getRecentWeekdayDates(4);
+          const bbox = "lat__greater_or_equal=32.790&lat__lower_or_equal=32.835&lon__greater_or_equal=35.060&lon__lower_or_equal=35.125";
+
+          for (const dateStr of candidateDates) {
+            const fromIso = `${dateStr}T05:30:00Z`; // ~07:30-08:30 Israel
+            const toIso = `${dateStr}T07:15:00Z`;   // ~09:15-10:15 Israel
+            const url = `${STRIDE_BASE}/siri_vehicle_locations/list?${bbox}&recorded_at_time_from=${encodeURIComponent(fromIso)}&recorded_at_time_to=${encodeURIComponent(toIso)}&siri_routes__operator_ref=3&siri_routes__line_ref=${encodeURIComponent(refs[0])}&order_by=recorded_at_time%20asc&limit=120`;
+            const res = await fetch(url);
+            if (!res.ok) continue;
+            const pings = await res.json();
+            if (Array.isArray(pings) && pings.length >= 4) {
+              // Keep pings from the single ride with the most GPS points so we plot one clean historical trip
+              const byRide = {};
+              pings.forEach((p) => {
+                const rid = p.siri_ride__id || "single";
+                if (!byRide[rid]) byRide[rid] = [];
+                byRide[rid].push(p);
+              });
+              const bestRide = Object.values(byRide).sort((a, b) => b.length - a.length)[0];
+              state.historyTracks[lineId] = { points: bestRide, date: dateStr };
+              drawHistoryLayer(lineId);
+              updateGeometryStatusUi();
+              return;
+            }
+          }
+          updateGeometryStatusUi();
+        } catch (e) {
+          updateGeometryStatusUi();
+        }
+      }
+
+      function drawHistoryLayer(lineId) {
+        const layer = historyLayers[lineId];
+        layer.clearLayers();
+        const track = state.historyTracks[lineId];
+        if (!track || !track.points || track.points.length < 2) return;
+
+        const latLngs = track.points.map((p) => [p.lat, p.lon]);
+        // Draw the real historical GPS breadcrumb path
+        L.polyline(latLngs, {
+          color: "#f59e0b",
+          weight: 4,
+          opacity: 0.9,
+          dashArray: "4, 6"
+        }).addTo(layer);
+
+        // Add clickable historical GPS ping dots with exact timestamps
+        track.points.forEach((p, idx) => {
+          if (idx % 2 !== 0 && idx !== track.points.length - 1) return;
+          const tStr = p.recorded_at_time
+            ? new Date(p.recorded_at_time).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })
+            : "";
+          L.circleMarker([p.lat, p.lon], {
+            radius: 4,
+            color: "#ffffff",
+            weight: 1.5,
+            fillColor: "#f59e0b",
+            fillOpacity: 0.95
+          })
+            .bindPopup(
+              `<div class="text-xs space-y-0.5">
+                <div class="font-extrabold text-amber-700">GPS היסטורי — ${LINES[lineId].label}</div>
+                <div>תאריך: <strong>${track.date}</strong> • שעה: <strong>${tStr}</strong></div>
+                <div class="text-slate-500 font-mono text-[10px]">${p.lat.toFixed(5)}, ${p.lon.toFixed(5)}</div>
+              </div>`
+            )
+            .addTo(layer);
+        });
+      }
+
+      function updateGeometryStatusUi() {
+        const activeIds = getActiveLineIds();
+        const snappedCount = activeIds.filter((id) => state.roadSnapped[id]).length;
+        if (snappedCount === activeIds.length) {
+          roadSnapStatus.textContent = "תוואי כבישים אמיתי (OSRM) פעיל ✓";
+          roadSnapStatus.className = "font-semibold text-emerald-700";
+        } else {
+          roadSnapStatus.textContent = "תוואי כבישים: ממתין לחיבור OSRM (מוצג קו עזר בין התחנות)";
+          roadSnapStatus.className = "font-semibold text-slate-600";
+        }
+
+        const loadedHist = activeIds
+          .map((id) => ({ id, t: state.historyTracks[id] }))
+          .filter((x) => x.t && x.t.points.length > 0);
+        if (loadedHist.length > 0) {
+          const summary = loadedHist.map((x) => `${LINES[x.id].label}: ${x.t.points.length} נק' (${x.t.date})`).join(" | ");
+          historyTrackStatus.textContent = `היסטוריית GPS בוקר: ${summary}`;
+          historyTrackStatus.className = "font-semibold text-amber-800";
+        } else {
+          historyTrackStatus.textContent = "היסטוריית GPS בוקר: תיטען אוטומטית בדפדפן מ-Stride API";
+          historyTrackStatus.className = "font-semibold text-slate-500";
+        }
+      }
+
+      function fitVisibleRoutes() {
+        const coords = [];
+        getActiveLineIds().forEach((id) => {
+          LINES[id].stops.forEach((s) => {
+            if (s.lat !== null && s.lng !== null) coords.push([s.lat, s.lng]);
+          });
+        });
+        if (coords.length > 0) {
+          map.fitBounds(L.latLngBounds(coords).pad(0.14));
+        }
+      }
+
+      function applyCardTheme(theme) {
+        const themes = {
+          emerald: { card: "border-emerald-200", header: "bg-emerald-50 border-emerald-100", badge: "bg-emerald-600 text-white" },
+          blue: { card: "border-blue-200", header: "bg-blue-50 border-blue-100", badge: "bg-blue-600 text-white" },
+          amber: { card: "border-amber-300", header: "bg-amber-50 border-amber-200", badge: "bg-amber-600 text-white" },
+          rose: { card: "border-rose-300", header: "bg-rose-50 border-rose-200", badge: "bg-rose-600 text-white" },
+          slate: { card: "border-slate-200", header: "bg-slate-50 border-slate-200", badge: "bg-slate-600 text-white" }
+        };
+        const t = themes[theme] || themes.slate;
+        decisionCard.className = `rounded-2xl border-2 bg-white shadow-sm overflow-hidden transition-colors ${t.card}`;
+        decisionHeader.className = `px-4 py-3 border-b flex flex-wrap items-center justify-between gap-2 ${t.header}`;
+        zoneBadge.className = `px-2.5 py-1 rounded-full text-xs font-extrabold ${t.badge}`;
+      }
+
+      function render() {
+        const activeIds = getActiveLineIds();
+
+        // Header line selector & badge
+        const lineBtnInactive = "px-3 py-1.5 rounded-lg text-xs font-extrabold transition text-slate-300 hover:text-white";
+        btnLine80.className = state.selectedLine === "80" ? "px-3 py-1.5 rounded-lg text-xs font-extrabold transition bg-blue-600 text-white" : lineBtnInactive;
+        btnLine80a.className = state.selectedLine === "80א" ? "px-3 py-1.5 rounded-lg text-xs font-extrabold transition bg-violet-600 text-white" : lineBtnInactive;
+        btnLineBoth.className = state.selectedLine === "both" ? "px-3 py-1.5 rounded-lg text-xs font-extrabold transition bg-emerald-500 text-slate-950" : lineBtnInactive;
+
+        if (state.selectedLine === "80") {
+          headerLineBadge.textContent = "80";
+          headerLineBadge.className = "px-2.5 h-11 min-w-[44px] rounded-xl bg-blue-500 text-white font-black text-lg flex items-center justify-center shadow-sm";
+          headerTitle.textContent = "מעקב חי קו 80 — אגד";
+        } else if (state.selectedLine === "80א") {
+          headerLineBadge.textContent = "80א";
+          headerLineBadge.className = "px-2.5 h-11 min-w-[44px] rounded-xl bg-violet-500 text-white font-black text-lg flex items-center justify-center shadow-sm";
+          headerTitle.textContent = "מעקב חי קו 80א — אגד";
+        } else {
+          headerLineBadge.textContent = "80/א";
+          headerLineBadge.className = "px-2.5 h-11 min-w-[44px] rounded-xl bg-emerald-500 text-slate-950 font-black text-base flex items-center justify-center shadow-sm";
+          headerTitle.textContent = "מעקב חי קווים 80 + 80א — אגד";
+        }
+
+        // Mode buttons & Simulation panel
+        if (state.mode === "live") {
+          btnModeLive.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-emerald-500 text-slate-950";
+          btnModeSim.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-300 hover:text-white";
+          simPanel.classList.add("hidden");
+        } else {
+          btnModeLive.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white";
+          btnModeSim.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-indigo-500 text-white";
+          simPanel.classList.remove("hidden");
+          simSliderWrap80.classList.toggle("hidden", !activeIds.includes("80"));
+          simSliderWrap80a.classList.toggle("hidden", !activeIds.includes("80א"));
+          simSlider80.value = String(state.simIndex["80"]);
+          simSlider80a.value = String(state.simIndex["80א"]);
+          simVal80.textContent = `${state.simIndex["80"] + 1}/${LINES["80"].stops.length}`;
+          simVal80a.textContent = `${state.simIndex["80א"] + 1}/${LINES["80א"].stops.length}`;
+        }
+
+        const rec = computeOverallRecommendation();
+        const targetObj =
+          state.customTarget && activeIds.includes(state.customTarget.lineId)
+            ? state.customTarget
+            : { lineId: rec.lineId, idx: rec.targetIdx };
+        const targetStop = LINES[targetObj.lineId].stops[targetObj.idx];
+
+        applyCardTheme(rec.theme);
+        zoneBadge.textContent = state.mode === "sim" ? `סימולציה • ${rec.zoneText}` : rec.zoneText;
+
+        const anyLiveBus = activeIds.some((id) => getBusPosition(id).idx !== null);
+        if (state.mode === "sim") {
+          freshnessText.textContent = "מצב תרגול — תרחיש בוקר 08:12";
+          liveNoticeBar.classList.add("hidden");
+        } else {
+          const latestRecAt = activeIds
+            .map((id) => state.liveData[id].recordedAt)
+            .filter(Boolean)
+            .sort()
+            .pop();
+          freshnessText.textContent = latestRecAt
+            ? `${formatAge(latestRecAt)} • שידור SIRI חי`
+            : state.liveStatusMessage;
+          if (!anyLiveBus && !state.isFetching) {
+            liveNoticeBar.classList.remove("hidden");
+            liveNoticeText.textContent = state.liveStatusMessage;
+          } else {
+            liveNoticeBar.classList.add("hidden");
+          }
+        }
+
+        // Main status readout
+        if (state.selectedLine === "both") {
+          dualLineStrip.classList.remove("hidden");
+          busPositionLabel.textContent = "מצב שני הקווים כרגע";
+          const p80 = getBusPosition("80");
+          const p80a = getBusPosition("80א");
+          dualText80.textContent =
+            p80.idx !== null ? `${p80.idx + 1}. ${LINES["80"].stops[p80.idx].name}` : "לא משדר כרגע";
+          dualText80a.textContent =
+            p80a.idx !== null ? `${p80a.idx + 1}. ${LINES["80א"].stops[p80a.idx].name}` : "לא משדר כרגע";
+
+          if (anyLiveBus) {
+            const bestPos = getBusPosition(rec.lineId);
+            const bestStop = LINES[rec.lineId].stops[bestPos.idx];
+            busStopTitle.textContent = `עדיפות כרגע: ${LINES[rec.lineId].label} (${bestStop.name})`;
+            busStopMeta.textContent = `קו 80 על ציר זבולון • קו 80א על ציר העצמאות/חנקין`;
+          } else {
+            busStopTitle.textContent = "אין כרגע שידור חי מ-80 או 80א בקרית אתא";
+            busStopMeta.textContent = "לחץ על 'סימולציה (08:00)' כדי לראות את שני המסלולים פועלים במקביל.";
+          }
+        } else {
+          dualLineStrip.classList.add("hidden");
+          const lid = state.selectedLine;
+          const pos = getBusPosition(lid);
+          busPositionLabel.textContent = `מיקום ${LINES[lid].label} כרגע`;
+          if (pos.idx !== null) {
+            const bStop = LINES[lid].stops[pos.idx];
+            const distNote =
+              state.mode === "live" && pos.distMeters !== null ? ` • ~${pos.distMeters} מ' מהתחנה` : "";
+            busStopTitle.textContent = `${pos.idx + 1}. ${bStop.name}`;
+            busStopMeta.innerHTML = `<span>מק"ט <strong>${bStop.code}</strong></span><span>•</span><span>${bStop.address}${distNote}</span>`;
+          } else {
+            busStopTitle.textContent = `אין כרגע ${LINES[lid].label} משדר בקרית אתא`;
+            busStopMeta.textContent = "לחץ על 'סימולציה (08:00)' כדי לבדוק את המסלול או רענן בשעות הפעילות.";
+          }
+        }
+
+        // Recommendation & Waze/GMaps
+        if (state.customTarget && activeIds.includes(state.customTarget.lineId)) {
+          targetLabel.textContent = `תחנת יעד שנבחרה ידנית (${LINES[targetObj.lineId].label})`;
+          btnResetTarget.classList.remove("hidden");
+        } else {
+          targetLabel.textContent = `תחנת יעד מומלצת (${LINES[targetObj.lineId].label})`;
+          btnResetTarget.classList.add("hidden");
+        }
+        recommendedStopName.textContent = `${targetStop.idx + 1}. ${targetStop.name} (${targetStop.code})`;
+        strategyAdvice.textContent = rec.advice;
+        if (targetStop.lat !== null && targetStop.lng !== null) {
+          btnWaze.href = `https://waze.com/ul?ll=${targetStop.lat},${targetStop.lng}&navigate=yes`;
+          btnGmaps.href = `https://www.google.com/maps/dir/?api=1&destination=${targetStop.lat},${targetStop.lng}`;
+        } else {
+          btnWaze.href = `https://waze.com/ul?q=${encodeURIComponent(targetStop.address)}&navigate=yes`;
+          btnGmaps.href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(targetStop.address)}`;
+        }
+
+        // Update Map Layers (polylines, stop markers, bus markers)
+        ["80", "80א"].forEach((lineId) => {
+          const visible = activeIds.includes(lineId);
+          const poly = routePolylines[lineId];
+          if (visible && !map.hasLayer(poly)) poly.addTo(map);
+          if (!visible && map.hasLayer(poly)) map.removeLayer(poly);
+          const hLayer = historyLayers[lineId];
+          if (visible && state.showHistoryTrack) {
+            if (!map.hasLayer(hLayer)) hLayer.addTo(map);
+          } else if (map.hasLayer(hLayer)) {
+            map.removeLayer(hLayer);
+          }
+
+          const pos = getBusPosition(lineId);
+          LINES[lineId].stops.forEach((stop, i) => {
+            const marker = stopMarkers[lineId][i];
+            if (!marker) return;
+            if (!visible) {
+              if (map.hasLayer(marker)) map.removeLayer(marker);
+              return;
+            }
+            if (!map.hasLayer(marker)) marker.addTo(map);
+            let color = LINES[lineId].color;
+            let highlight = false;
+            if (targetObj.lineId === lineId && targetObj.idx === i) {
+              color = "#059669";
+              highlight = true;
+            } else if (pos.idx !== null && i < pos.idx) {
+              color = "#94a3b8";
+            } else if (pos.idx !== null && i === pos.idx) {
+              color = LINES[lineId].color;
+              highlight = true;
+            }
+            marker.setIcon(buildStopIcon(i + 1, color, highlight));
+          });
+
+          if (visible && pos.latLng) {
+            if (!busMarkers[lineId]) {
+              busMarkers[lineId] = L.marker(pos.latLng, { icon: buildBusIcon(lineId), zIndexOffset: 1000 }).addTo(map);
+            } else {
+              busMarkers[lineId].setLatLng(pos.latLng);
+              if (!map.hasLayer(busMarkers[lineId])) busMarkers[lineId].addTo(map);
+            }
+            const bStop = LINES[lineId].stops[pos.idx];
+            busMarkers[lineId].bindPopup(
+              `<div class="text-xs space-y-1">
+                <div class="font-extrabold" style="color:${LINES[lineId].color}">${LINES[lineId].label} (אגד) — פעיל</div>
+                <div>קרוב לתחנה: <strong>${bStop.name}</strong></div>
+                <div>${state.mode === "sim" ? "מצב סימולציה" : formatAge(pos.recordedAt)}</div>
+              </div>`
+            );
+          } else if (busMarkers[lineId] && map.hasLayer(busMarkers[lineId])) {
+            map.removeLayer(busMarkers[lineId]);
+          }
+        });
+
+        // Stops list header & sub-filter
+        if (state.selectedLine === "both") {
+          stopsListHeading.textContent = "תחנות איסוף — 80 + 80א";
+          bothListFilterBar.classList.remove("hidden");
+          stopsRemainingBadge.textContent = "24 תחנות";
+          document.querySelectorAll(".list-filter-btn").forEach((b) => {
+            const val = b.getAttribute("data-list-filter");
+            b.className =
+              val === state.listFilter
+                ? "list-filter-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-900 text-white transition"
+                : "list-filter-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-white border border-slate-200 text-slate-700 transition";
+          });
+        } else {
+          const lid = state.selectedLine;
+          stopsListHeading.textContent = `תחנות איסוף — ${LINES[lid].label}`;
+          bothListFilterBar.classList.add("hidden");
+          const pos = getBusPosition(lid);
+          const total = LINES[lid].stops.length;
+          stopsRemainingBadge.textContent =
+            pos.idx !== null ? `נותרו ${total - 1 - pos.idx} תחנות` : `${total} תחנות`;
+        }
+
+        updatePushUi();
+        updateGeometryStatusUi();
+        if (state.showHistoryTrack) {
+          btnToggleHistory.textContent = "היסטוריית GPS (פעיל)";
+          btnToggleHistory.className = "px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-xs font-bold transition";
+        } else {
+          btnToggleHistory.textContent = "הצג היסטוריית GPS";
+          btnToggleHistory.className = "px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-bold transition";
+        }
+
+        // Build rows for displayed lines
+        const listLines =
+          state.selectedLine === "both"
+            ? state.listFilter === "both"
+              ? ["80", "80א"]
+              : [state.listFilter]
+            : [state.selectedLine];
+
+        const rowsHtml = [];
+        listLines.forEach((lineId) => {
+          const pos = getBusPosition(lineId);
+          const line = LINES[lineId];
+          line.stops.forEach((stop, i) => {
+            const alertKey = `${lineId}:${stop.code}`;
+            const isBusHere = pos.idx === i;
+            const isPassed = pos.idx !== null && i < pos.idx;
+            const isTarget = targetObj.lineId === lineId && targetObj.idx === i;
+            const isAlertOn = state.alertStops.has(alertKey);
+            const hasFired = state.firedAlertStops.has(alertKey);
+
+            let rowClasses = "border border-transparent hover:bg-slate-50";
+            let badgeHtml = `<span class="text-[11px] font-semibold text-slate-400">הבא</span>`;
+
+            if (isBusHere) {
+              rowClasses = lineId === "80" ? "bg-blue-50 border border-blue-300" : "bg-violet-50 border border-violet-300";
+              badgeHtml = `<span class="px-2 py-0.5 rounded-full text-white text-[11px] font-bold" style="background:${line.color}">האוטובוס כאן</span>`;
+            } else if (isTarget) {
+              rowClasses = "bg-emerald-50 border border-emerald-300";
+              const delta = pos.idx !== null && i > pos.idx ? ` (+${i - pos.idx})` : "";
+              badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[11px] font-bold">יעד${delta}</span>`;
+            } else if (isPassed) {
+              rowClasses = "opacity-65 hover:opacity-100 hover:bg-slate-50 border border-transparent";
+              badgeHtml = `<span class="text-[11px] font-semibold text-slate-400">עבר</span>`;
+            } else if (pos.idx !== null) {
+              badgeHtml = `<span class="text-[11px] font-semibold text-indigo-600">+${i - pos.idx}</span>`;
+            }
+
+            const bellBtnClass = isAlertOn
+              ? hasFired
+                ? "bg-emerald-100 text-emerald-700 border-emerald-300"
+                : "bg-amber-100 text-amber-700 border-amber-300"
+              : "bg-white text-slate-400 border-slate-200 hover:text-amber-600 hover:border-amber-300";
+            const lineChip =
+              state.selectedLine === "both"
+                ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold text-white shrink-0" style="background:${line.color}">${lineId}</span>`
+                : "";
+
+            rowsHtml.push(`
+              <div class="w-full px-2.5 py-2 rounded-xl transition flex items-center justify-between gap-2 ${rowClasses}">
+                <button type="button" data-stop-line="${lineId}" data-stop-idx="${i}" class="stop-row flex-1 text-right flex items-center gap-2 min-w-0">
+                  <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center shrink-0 ${
+                    isBusHere
+                      ? "text-white"
+                      : isTarget
+                      ? "bg-emerald-600 text-white"
+                      : isPassed
+                      ? "bg-slate-300 text-slate-700"
+                      : "bg-slate-100 text-slate-700"
+                  }" style="${isBusHere ? `background:${line.color}` : ""}">${i + 1}</span>
+                  ${lineChip}
+                  <div class="min-w-0">
+                    <div class="text-xs sm:text-sm font-bold text-slate-900 truncate">${stop.name}</div>
+                    <div class="text-[11px] text-slate-500 truncate">${stop.address} • ${stop.code}</div>
+                  </div>
+                </button>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  ${badgeHtml}
+                  <button type="button" data-alert-key="${alertKey}" title="התראת פוש לתחנה זו" aria-label="התראת פוש לתחנה זו"
+                    class="stop-alert-btn w-8 h-8 rounded-lg border flex items-center justify-center transition ${bellBtnClass}">
+                    <span class="text-sm leading-none">${isAlertOn ? "🔔" : "🔕"}</span>
+                  </button>
+                </div>
+              </div>
+            `);
+          });
+        });
+
+        stopsList.innerHTML = rowsHtml.join("");
+
+        stopsList.querySelectorAll(".stop-row").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const lineId = btn.getAttribute("data-stop-line");
+            const idx = Number(btn.getAttribute("data-stop-idx"));
+            state.customTarget = { lineId, idx };
+            render();
+            const s = LINES[lineId].stops[idx];
+            if (s.lat !== null && s.lng !== null && stopMarkers[lineId][idx]) {
+              map.flyTo([s.lat, s.lng], 15, { duration: 0.6 });
+              stopMarkers[lineId][idx].openPopup();
+            }
+          });
+        });
+
+        stopsList.querySelectorAll(".stop-alert-btn").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const key = btn.getAttribute("data-alert-key");
+            if (state.alertStops.has(key)) {
+              state.alertStops.delete(key);
+              state.firedAlertStops.delete(key);
+            } else {
+              state.alertStops.add(key);
+              state.firedAlertStops.delete(key);
+            }
+            saveAlertStops();
+            render();
+          });
+        });
+
+        simPlayLabel.textContent = state.simPlaying ? "עצור תנועה" : "הפעל תנועה";
+        checkStopAlerts();
+      }
+
+      // Live API fetching for 80 and 80א from Open Bus Stride API
+      async function resolveLineRefs(lineId) {
+        if (state.liveData[lineId].lineRefs.length > 0) return state.liveData[lineId].lineRefs;
+        const today = new Date().toISOString().slice(0, 10);
+        const url = `${STRIDE_BASE}/gtfs_routes/list?route_short_name=${encodeURIComponent(lineId)}&operator_refs=3&date_from=${today}&date_to=${today}&limit=30`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const routes = await res.json();
+        const matching = routes.filter((r) => {
+          const text = `${r.route_long_name || ""} ${r.route_mkt || ""}`;
+          return text.includes("קרית אתא") || text.includes("קריית אתא") || text.includes("קריית שמואל") || text.includes("חיפה");
+        });
+        const chosen = matching.length > 0 ? matching : routes;
+        const refs = [...new Set(chosen.map((r) => r.line_ref).filter(Boolean))];
+        state.liveData[lineId].lineRefs = refs;
+        return refs;
+      }
+
+      async function fetchLineLive(lineId) {
+        const refs = await resolveLineRefs(lineId);
+        const now = new Date();
+        // 35-min window + strict upper cap (now + 5 min) to prevent 2038 corrupt timestamps
+        const fromIso = new Date(now.getTime() - 35 * 60 * 1000).toISOString();
+        const toIso = new Date(now.getTime() + 5 * 60 * 1000).toISOString();
+        const bbox = "lat__greater_or_equal=32.790&lat__lower_or_equal=32.835&lon__greater_or_equal=35.060&lon__lower_or_equal=35.125";
+
+        const refsToQuery = refs.length > 0 ? refs.slice(0, 4) : [null];
+        const batches = await Promise.all(
+          refsToQuery.map(async (ref) => {
+            const lineParam = ref ? `&siri_routes__line_ref=${encodeURIComponent(ref)}` : "";
+            const locUrl = `${STRIDE_BASE}/siri_vehicle_locations/list?${bbox}&recorded_at_time_from=${encodeURIComponent(fromIso)}&recorded_at_time_to=${encodeURIComponent(toIso)}&siri_routes__operator_ref=3${lineParam}&order_by=recorded_at_time%20desc&limit=30`;
+            const res = await fetch(locUrl);
+            if (!res.ok) throw new Error(`Stride HTTP ${res.status}`);
+            const rows = await res.json();
+            return Array.isArray(rows) ? rows : [];
+          })
+        );
+        const pings = batches
+          .flat()
+          .filter((p) => p && p.lat && p.lon)
+          .sort((a, b) => new Date(b.recorded_at_time) - new Date(a.recorded_at_time));
+
+        if (pings.length > 0) {
+          const latest = pings[0];
+          const nearest = findNearestStop(lineId, latest.lat, latest.lon);
+          state.liveData[lineId].busIndex = nearest.idx;
+          state.liveData[lineId].latLng = [latest.lat, latest.lon];
+          state.liveData[lineId].recordedAt = latest.recorded_at_time;
+          state.liveData[lineId].distMeters = nearest.distMeters;
+          state.liveData[lineId].snapshotId = latest.siri_snapshot__snapshot_id || null;
+          return pings.length;
+        }
+        state.liveData[lineId].busIndex = null;
+        state.liveData[lineId].latLng = null;
+        state.liveData[lineId].recordedAt = null;
+        state.liveData[lineId].distMeters = null;
+        state.liveData[lineId].snapshotId = null;
+        return 0;
+      }
+
+      async function fetchLiveAll() {
+        if (state.mode !== "live") return;
+        state.isFetching = true;
+        freshnessText.textContent = "מושך מיקום חי מ-Open Bus Stride API...";
+        const activeIds = getActiveLineIds();
+        try {
+          const counts = await Promise.all(activeIds.map((id) => fetchLineLive(id)));
+          const totalPings = counts.reduce((a, b) => a + b, 0);
+          const timeStr = new Date().toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+          apiMetaFooter.textContent = `בדיקה אחרונה: ${timeStr} • ${totalPings} שידורים`;
+          if (totalPings > 0) {
+            state.liveStatusMessage = "מחובר לשידור חי";
+          } else {
+            state.liveStatusMessage = "לא נקלט שידור GPS פעיל בקרית אתא ב-20 הדקות האחרונות (ייתכן שאין כרגע אוטובוס בדרך).";
+          }
+        } catch (err) {
+          activeIds.forEach((id) => {
+            state.liveData[id].busIndex = null;
+            state.liveData[id].latLng = null;
+            state.liveData[id].recordedAt = null;
+          });
+          state.liveStatusMessage = "לא ניתן היה למשוך כרגע נתון חי משרת Open Bus Stride (נסה שוב או עבור למצב סימולציה).";
+          apiMetaFooter.textContent = "שגיאת חיבור ל-Stride API";
+        } finally {
+          state.isFetching = false;
+          render();
+        }
+      }
+
+      function setupAutoRefresh() {
+        if (state.refreshTimer) {
+          clearInterval(state.refreshTimer);
+          state.refreshTimer = null;
+        }
+        if (state.autoRefresh && state.mode === "live") {
+          state.refreshTimer = setInterval(fetchLiveAll, 15000);
+        }
+      }
+
+      function stopSimPlayback() {
+        if (state.simTimer) {
+          clearInterval(state.simTimer);
+          state.simTimer = null;
+        }
+        state.simPlaying = false;
+      }
+
+      function switchLine(newLine) {
+        state.selectedLine = newLine;
+        state.customTarget = null;
+        if (newLine === "both") state.listFilter = "both";
+        render();
+        fitVisibleRoutes();
+        if (state.mode === "live") fetchLiveAll();
+      }
+
+      function switchMode(newMode) {
+        state.mode = newMode;
+        state.customTarget = null;
+        state.firedAlertStops.clear();
+        if (newMode === "live") {
+          stopSimPlayback();
+          setupAutoRefresh();
+          render();
+          fetchLiveAll();
+        } else {
+          if (state.refreshTimer) {
+            clearInterval(state.refreshTimer);
+            state.refreshTimer = null;
+          }
+          render();
+          fitVisibleRoutes();
+        }
+      }
+
+      // Event Listeners
+      btnLine80.addEventListener("click", () => switchLine("80"));
+      btnLine80a.addEventListener("click", () => switchLine("80א"));
+      btnLineBoth.addEventListener("click", () => switchLine("both"));
+
+      btnModeLive.addEventListener("click", () => switchMode("live"));
+      btnModeSim.addEventListener("click", () => switchMode("sim"));
+      btnQuickSim.addEventListener("click", () => switchMode("sim"));
+
+      btnRefresh.addEventListener("click", () => {
+        if (state.mode === "live") {
+          fetchLiveAll();
+        } else {
+          getActiveLineIds().forEach((id) => {
+            state.simIndex[id] = (state.simIndex[id] + 1) % LINES[id].stops.length;
+          });
+          render();
+        }
+      });
+
+      toggleAutoRefresh.addEventListener("change", (e) => {
+        state.autoRefresh = e.target.checked;
+        setupAutoRefresh();
+      });
+
+      btnResetTarget.addEventListener("click", () => {
+        state.customTarget = null;
+        render();
+      });
+
+      simSlider80.addEventListener("input", (e) => {
+        state.simIndex["80"] = Number(e.target.value);
+        render();
+      });
+
+      simSlider80a.addEventListener("input", (e) => {
+        state.simIndex["80א"] = Number(e.target.value);
+        render();
+      });
+
+      document.querySelectorAll(".sim-preset-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          stopSimPlayback();
+          const preset = btn.getAttribute("data-sim-preset");
+          const map80 = { start: 1, mid: 8, late: 12, junction: 14 };
+          const map80a = { start: 0, mid: 2, late: 5, junction: 6 };
+          state.simIndex["80"] = map80[preset] ?? 0;
+          state.simIndex["80א"] = map80a[preset] ?? 0;
+          state.customTarget = null;
+          state.firedAlertStops.clear();
+          render();
+        });
+      });
+
+      btnSimPlay.addEventListener("click", () => {
+        if (state.simPlaying) {
+          stopSimPlayback();
+          render();
+        } else {
+          state.simPlaying = true;
+          render();
+          state.simTimer = setInterval(() => {
+            getActiveLineIds().forEach((id) => {
+              const nextIdx = (state.simIndex[id] + 1) % LINES[id].stops.length;
+              if (nextIdx === 0) {
+                LINES[id].stops.forEach((s) => state.firedAlertStops.delete(`${id}:${s.code}`));
+              }
+              state.simIndex[id] = nextIdx;
+            });
+            render();
+          }, 1800);
+        }
+      });
+
+      document.querySelectorAll(".list-filter-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          state.listFilter = btn.getAttribute("data-list-filter");
+          render();
+        });
+      });
+
+      btnFocusBus.addEventListener("click", () => {
+        const pts = getActiveLineIds()
+          .map((id) => getBusPosition(id).latLng)
+          .filter(Boolean);
+        if (pts.length === 1) {
+          map.flyTo(pts[0], 15, { duration: 0.6 });
+        } else if (pts.length > 1) {
+          map.fitBounds(L.latLngBounds(pts).pad(0.35));
+        } else {
+          fitVisibleRoutes();
+        }
+      });
+
+      btnFitRoute.addEventListener("click", fitVisibleRoutes);
+
+      // Welcome banner dismiss persistence
+      try {
+        if (localStorage.getItem("bus80_welcome_dismissed") === "1") {
+          welcomeBanner.classList.add("hidden");
+        }
+      } catch (e) {}
+
+      btnDismissWelcome.addEventListener("click", () => {
+        welcomeBanner.classList.add("hidden");
+        try { localStorage.setItem("bus80_welcome_dismissed", "1"); } catch (e) {}
+      });
+
+      // Share button (copy invite message + current URL)
+      btnShareApp.addEventListener("click", async () => {
+        const shareUrl = window.location.href.startsWith("http") ? window.location.href : "";
+        const shareText = `🚌 תושבי והורי קרית אתא!\nאפליקציה חינמית למעקב אחרי קווים 80 ו-80א לכיוון חיפה — מפה חיה, המלצה לאיזו תחנה להוריד את הילדים, ניווט ב-Waze והתראות הגעה לתחנות שבחרתם.${shareUrl ? "\n" + shareUrl : ""}`;
+        let copied = false;
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(shareText);
+            copied = true;
+          }
+        } catch (e) {}
+        if (!copied) {
+          try {
+            const ta = document.createElement("textarea");
+            ta.value = shareText;
+            ta.style.position = "fixed";
+            ta.style.opacity = "0";
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            ta.remove();
+            copied = true;
+          } catch (e) {}
+        }
+        showPushToast(
+          copied ? "הודעת השיתוף הועתקה!" : "מוכן לשיתוף",
+          "אפשר להדביק עכשיו בקבוצת הווטסאפ של ההורים והשכנים בקרית אתא.",
+          null
+        );
+      });
+
+      btnLockMap.addEventListener("click", () => {
+        state.mapLocked = !state.mapLocked;
+        if (state.mapLocked) {
+          map.dragging.disable();
+          map.touchZoom.disable();
+          mapLockOverlay.classList.remove("hidden");
+          btnLockMap.textContent = "שחרר מפה 🔓";
+          btnLockMap.className = "px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-xs font-bold transition";
+        } else {
+          map.dragging.enable();
+          map.touchZoom.enable();
+          mapLockOverlay.classList.add("hidden");
+          btnLockMap.textContent = "נעל מפה לגלילה";
+          btnLockMap.className = "px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition";
+        }
+      });
+
+      btnToggleHistory.addEventListener("click", () => {
+        state.showHistoryTrack = !state.showHistoryTrack;
+        render();
+      });
+
+      btnEnablePush.addEventListener("click", async () => {
+        if (typeof Notification === "undefined") {
+          showPushToast("התראות פנימיות פעילות", "הדפדפן אינו תומך בפוש מערכת, אך התראות מסך + צליל יעבדו כאן.", null);
+          return;
+        }
+        try {
+          const perm = await Notification.requestPermission();
+          state.pushPermission = perm;
+          updatePushUi();
+          if (perm === "granted") {
+            triggerStopPush("80", LINES["80"].stops[0], true);
+          } else {
+            showPushToast("התראת מסך פעילה", "לא ניתנה הרשאת פוש מערכת — תקבל התראת מסך וצליל בתוך האפליקציה.", null);
+          }
+        } catch (e) {
+          showPushToast("התראת מסך פעילה", "התראות המסך והצליל פעילות עבור התחנות שסימנת.", null);
+        }
+      });
+
+      btnTestPush.addEventListener("click", () => {
+        const firstKey = state.alertStops.size > 0 ? [...state.alertStops][0] : `${getActiveLineIds()[0]}:${LINES[getActiveLineIds()[0]].stops[0].code}`;
+        const [lid, code] = firstKey.split(":");
+        const stop = (LINES[lid] && LINES[lid].stops.find((s) => s.code === code)) || LINES["80"].stops[0];
+        triggerStopPush(LINES[lid] ? lid : "80", stop, true);
+      });
+
+      btnClearAlerts.addEventListener("click", () => {
+        state.alertStops.clear();
+        state.firedAlertStops.clear();
+        saveAlertStops();
+        render();
+      });
+
+      toggleAlertSound.addEventListener("change", (e) => {
+        state.alertSound = e.target.checked;
+      });
+
+      // Init
+      initMapLayers();
+      if (window.lucide && typeof window.lucide.createIcons === "function") {
+        window.lucide.createIcons();
+      }
+      render();
+      fitVisibleRoutes();
+      setupAutoRefresh();
+      fetchLiveAll();
+      // Hydrate exact GTFS coords (e.g. 40377 י.ל. פרץ/פרישמן), then snap both routes onto real streets (OSRM)
+      hydrateMissingStopCoords().then(() => {
+        Promise.all([loadRoadGeometry("80"), loadRoadGeometry("80א")]);
+      });
+      Promise.all([loadHistoricalGpsTrack("80"), loadHistoricalGpsTrack("80א")]);
+    })();
+  </script>
+</body>
+</html>
