@@ -1,0 +1,62 @@
+---
+app_catalog: true
+title: "מסע בעקבות קריאת שמע"
+summary: "מסכת ברכות, פרק א׳, עם לימוד לפי משנה ומבחן דמה."
+thumbnail: "screenshots/home.webp"
+thumbnail_alt: "מסך הפתיחה של מסע בעקבות קריאת שמע"
+---
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>מסע בעקבות קריאת שמע | אפליקציות לימוד</title>
+  <meta name="description" content="מסכת ברכות, פרק א׳, עם לימוד לפי משנה ומבחן דמה.">
+  <style>
+    body { margin: 0; background: #f1f5ff; color: #13254a; font: 1.1rem/1.65 system-ui, sans-serif; }
+    main { max-width: 66rem; margin: auto; padding: clamp(1.25rem, 5vw, 3.5rem) 1rem; }
+    header, figure { background: white; border: 1px solid #d9e3fa; border-radius: 1rem; }
+    header { padding: clamp(1.25rem, 4vw, 2.5rem); margin-block: 1rem 2rem; }
+    h1 { line-height: 1.2; margin: 0; font-size: clamp(2rem, 6vw, 3.5rem); }
+    h2 { margin-block: 0 .5rem; }
+    a { color: #15469a; }
+    a:focus-visible { outline: 3px solid #15469a; outline-offset: 4px; }
+    .launch { display: inline-block; background: #15469a; color: white; text-decoration: none; font-weight: 750; border-radius: .65rem; padding: .65rem 1.1rem; }
+    .gallery { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); }
+    figure { margin: 0; overflow: hidden; }
+    figure a, figure img { display: block; }
+    figure img { width: 100%; height: auto; }
+    figcaption { padding: .8rem 1rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <nav aria-label="ניווט"><a href="../../">חזרה לכל האפליקציות</a></nav>
+    <header>
+      <h1>מסע בעקבות קריאת שמע</h1>
+      <p>תרגול של חמש המשניות בפרק א׳ במסכת ברכות, העוסקות בזמני קריאת שמע ובברכותיה.</p>
+      <a class="launch" href="./play.html">פתיחת האפליקציה</a>
+    </header>
+    <section aria-labelledby="how">
+      <h2 id="how">איך משתמשים?</h2>
+      <ol>
+        <li>בחרו משנה וקראו את ההסבר. כפתורי השמע מקריאים שאלות ותשובות.</li>
+        <li>ענו על שאלות, חזרו על טעויות או עברו למבחן הדמה.</li>
+      </ol>
+    </section>
+    <section aria-labelledby="screens">
+      <h2 id="screens">מתוך האפליקציה</h2>
+      <div class="gallery">
+        <figure>
+          <a href="./screenshots/home.webp"><img src="./screenshots/home.webp" width="1050" height="721" alt="מסך הפתיחה של מסע בעקבות קריאת שמע" loading="lazy"></a>
+          <figcaption>מסך הפתיחה</figcaption>
+        </figure>
+        <figure>
+          <a href="./screenshots/activity.webp"><img src="./screenshots/activity.webp" width="1050" height="721" alt="שאלה מתוך מבחן הדמה" loading="lazy"></a>
+          <figcaption>שאלה מתוך מבחן הדמה</figcaption>
+        </figure>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
