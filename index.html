@@ -33,7 +33,7 @@
         {% for app in apps %}
           <li class="card">
             {% if app.thumbnail %}
-              {% assign app_directory = app.url | split: "/" | pop | join: "/" %}
+              {% assign app_directory = app.path | split: "/" | pop | join: "/" %}
               {% assign image_url = app_directory | append: "/" | append: app.thumbnail %}
               <img src="{{ image_url | relative_url | escape }}" alt="{{ app.thumbnail_alt | escape }}" loading="lazy">
             {% endif %}
