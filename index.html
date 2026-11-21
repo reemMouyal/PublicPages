@@ -1,3 +1,5 @@
+---
+---
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
@@ -5,16 +7,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>אפליקציות לימוד</title>
   <style>
-    body { margin: 0; padding: 2rem 1rem; font: 1.125rem/1.6 system-ui, sans-serif; background: #f1f5ff; color: #13254a; }
-    main { max-width: 40rem; margin: 8vh auto; padding: clamp(1.25rem, 5vw, 3rem); background: white; border-radius: 1.25rem; border: 1px solid #d9e3fa; }
-    h1 { margin-block: 0 .5rem; line-height: 1.2; }
-    p { margin-block: 0; }
+    body { margin: 0; font: 1.125rem/1.6 system-ui, sans-serif; background: #f1f5ff; color: #13254a; }
+    main { max-width: 68rem; margin: auto; padding: clamp(2rem, 7vw, 5rem) 1rem; }
+    h1 { margin: 0 0 1.5rem; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.15; }
+    .empty, .card { background: white; border: 1px solid #d9e3fa; border-radius: 1.25rem; }
+    .empty { padding: 1.25rem; }
+    ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); }
+    .card { overflow: hidden; }
+    .card img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: contain; background: #e8eefc; }
+    .details { padding: 1.25rem; }
+    h2 { margin: 0; font-size: 1.4rem; }
+    p { margin: .5rem 0 0; }
+    a { color: #15469a; text-underline-offset: .2em; }
+    a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   </style>
 </head>
 <body>
   <main>
     <h1>אפליקציות לימוד</h1>
-    <p>אפליקציות הלימוד יופיעו כאן אחרי שיועלו.</p>
+    {% assign apps = site.html_pages | where: "app_catalog", true | sort: "title" %}
+    {% if apps.size == 0 %}
+      <p class="empty">אפליקציות הלימוד יופיעו כאן אחרי שיועלו.</p>
+    {% else %}
+      <ul>
+        {% for app in apps %}
+          <li class="card">
+            {% if app.thumbnail %}
+              {% assign app_directory = app.url | split: "/" | pop | join: "/" %}
+              {% assign image_url = app_directory | append: "/" | append: app.thumbnail %}
+              <img src="{{ image_url | relative_url | escape }}" alt="{{ app.thumbnail_alt | escape }}" loading="lazy">
+            {% endif %}
+            <div class="details">
+              <h2><a href="{{ app.url | relative_url | escape }}">{{ app.title | escape }}</a></h2>
+              <p>{{ app.summary | escape }}</p>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
   </main>
 </body>
 </html>
