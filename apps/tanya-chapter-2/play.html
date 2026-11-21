@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="לימוד ושינון פרק ב׳ בליקוטי אמרים, צעד אחר צעד">
+<title>תניא בעל פה · פרק ב׳</title>
+<style>
+:root{color-scheme:light;--ink:#172e2a;--green:#205547;--light:#e7efe6;--paper:#fffdf7;--line:#d9e1d6;--muted:#52665f;--gold:#e6ba60}*{box-sizing:border-box}body{margin:0;background:#f3f2e8;color:var(--ink);font:16px system-ui,Arial,sans-serif}main{max-width:1000px;margin:auto;padding:26px 18px 36px}header{background:#173c34;color:#fffdf6;border-radius:24px;padding:clamp(24px,5vw,48px);position:relative;overflow:hidden}header::after{content:"ב";position:absolute;left:6%;top:-38%;font:bold clamp(150px,35vw,340px) Georgia,serif;color:#fff1;pointer-events:none}header p{margin:0 0 7px;color:#f3cf82}h1{font-size:clamp(36px,7vw,63px);margin:0;letter-spacing:-.045em}header div{margin-top:10px;max-width:34ch;line-height:1.55}.layout{display:grid;grid-template-columns:minmax(0,1fr) 245px;gap:16px;margin-top:18px;align-items:start}.card,aside{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:clamp(15px,3vw,25px)}aside h2{font-size:19px;margin:0 0 5px}aside p,.small{font-size:14px;color:var(--muted);margin:0}progress{width:100%;height:12px;accent-color:var(--green);margin:12px 0}label{display:block;font-weight:700;margin:8px 0 5px}select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--ink);font:inherit}.tabs,.actions,.navigation,.choices{display:flex;gap:8px;flex-wrap:wrap}.tabs{margin:16px 0}.top{display:flex;justify-content:space-between;gap:10px;align-items:center}.top h2{margin:0;font-size:22px}button{font:inherit;font-weight:650;color:var(--green);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-height:44px;cursor:pointer}button:hover{background:var(--light)}button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #9c6117;outline-offset:2px}button.primary,button[aria-pressed=true]{background:var(--green);border-color:var(--green);color:white}button:disabled{opacity:.5;cursor:default}button.blank{display:inline;vertical-align:middle;border:0;border-bottom:2px solid var(--green);border-radius:6px;background:var(--light);padding:0 12px;min-width:68px;font:inherit;font-weight:700}button.solved{background:#d9ecda;border-color:#51885f}.reading{background:#f0f3e9;border-radius:14px;padding:clamp(15px,3vw,25px);font-family:"Times New Roman",serif;font-size:clamp(24px,4vw,33px);line-height:1.65;margin:10px 0 12px;min-height:126px;overflow-wrap:anywhere}.reading p{margin:0 0 .65em}.reading p:last-child{margin:0}.reading small{font:16px system-ui}.actions{margin-top:10px}.navigation{justify-content:space-between;margin-top:17px;border-top:1px solid var(--line);padding-top:12px}.choices{margin-top:9px}.status{min-height:25px;margin:8px 0 0;color:var(--green);font-weight:650}.source{margin:16px 0 0;font-size:14px}.source a{color:var(--green)}[hidden]{display:none!important}@media(max-width:680px){main{padding:12px}.layout{grid-template-columns:1fr}aside{grid-row:1}.top h2{font-size:19px}header{border-radius:18px}}
+</style>
+</head>
+<body>
+<main>
+<header><p>ליקוטי אמרים</p><h1>תניא בעל פה</h1><div>פרק ב׳ · קוראים בקול, משלימים מילים ומדקלמים מהזיכרון.</div></header>
+<div class="layout">
+<section class="card" aria-labelledby="sectionTitle">
+<div class="top"><h2 id="sectionTitle"></h2><span id="counter" class="small"></span></div>
+<div class="tabs" aria-label="מצבי תרגול">
+<button id="readTab" aria-pressed="true">קריאה</button>
+<button id="fillTab" aria-pressed="false">השלמת מילים</button>
+<button id="sayTab" aria-pressed="false">דקלום</button>
+</div>
+<p id="instruction" class="small"></p>
+<div id="reading" class="reading"></div>
+<div id="choices" class="choices" aria-label="אפשרויות להשלמה"></div>
+<div class="actions">
+<button id="listen">השמעה</button>
+<button id="hint" hidden>עוד רמז</button>
+<button id="reveal" hidden>הצגת הנוסח</button>
+<button id="master" class="primary" hidden>דקלמתי בלי עזרה</button>
+<button id="retry" hidden>נסה שוב</button>
+</div>
+<p id="status" class="status" role="status"></p>
+<div class="navigation"><button id="prev">המקטע הקודם</button><button id="next">המקטע הבא</button></div>
+</section>
+<aside>
+<h2>ההתקדמות שלי</h2><p id="progressLabel"></p>
+<progress id="progress" value="0" aria-label="מקטעים שנלמדו"></progress>
+<label for="jump">בחירת מקטע</label><select id="jump"></select>
+<div class="actions"><button id="review" aria-pressed="false">חזרה על כל הפרק</button></div>
+<p class="source"><a href="https://he.chabad.org/library/article_cdo/aid/369450" target="_blank" rel="noopener">הנוסח המנוקד באתר בית חב״ד ↗</a></p>
+</aside>
+</div>
+</main>
+<script id="chapter" type="text/plain">
+ונפש השנית בישראל, היא חלק אלוה ממעל ממש, כמו שכתוב: "ויפח באפיו נשמת חיים", ו"אתה נפחת בי",
+וכמו שכתוב בזהר, מאן דנפח מתוכיה נפח, פירוש, מתוכיותו ומפנימיותו, שתוכיות ופנימיות החיות שבאדם מוציא בנפיחתו בכח:
+כך, על דרך משל, נשמות ישראל עלו במחשבה, כדכתיב: "בני בכורי ישראל", "בנים אתם לה' אלהיכם"
+פירוש, כמו שהבן נמשך ממוח האב, כך כביכול נשמת כל איש ישראל נמשכה ממחשבתו וחכמתו יתברך,
+דאיהו חכים ולא בחכמה ידיעא, אלא הוא וחכמתו אחד, וכמו שכתב הרמב"ם, והודו לו חכמי הקבלה, כמו שכתוב בפרדס מהרמ"ק.
+וגם לפי קבלת האר"י זכרונו לברכה יציבא מילתא, בסוד התלבשות אור־אין־סוף ברוך־הוא, על־ידי צמצומים רבים, בכלים דחכמה־בינה־דעת דאצילות,
+אך לא למעלה מהאצילות, וכמו שכתוב במקום אחר, שאין־סוף־ברוך־הוא מרומם ומתנשא רוממות אין קץ, למעלה מעלה ממהות ובחינת חכמה־בינה־דעת,
+עד שמהות ובחינת חכמה־בינה־דעת נחשבת כעשייה גופנית אצלו יתברך, כמו שכתוב: "כולם בחכמה עשית":
+שהוא המדע והוא היודע כו', ודבר זה אין ביכולת האדם להבינו על בוריו כו',
+כדכתיב: "החקר אלוה תמצא", וכתיב: "כי לא מחשבותי מחשבותיכם וגו'".
+ואף שיש רבבות מיני חילוקי מדרגות בנשמות, גבוה מעל גבוה לאין קץ,
+כמו גודל מעלת נשמות האבות ומשה רבינו עליהם־השלום, על נשמות דורותינו אלה דעקבי משיחא, שהם בחינת עקביים ממש לגבי המוח והראש;
+וכן בכל דור ודור יש ראשי אלפי ישראל, שנשמותיהם הם בחינת ראש ומוח לגבי נשמות ההמון ועמי הארץ;
+וכן נפשות לגבי נפשות, כי כל נפש כלולה מנפש רוח ונשמה.
+מכל מקום, שרש כל הנפש רוח ונשמה כולם, מראש כל המדריגות עד סוף כל דרגין, המלובש בגוף עמי הארץ וקל שבקלים,
+נמשך ממוח העליון, שהיא חכמה עילאה כביכול.
+כמשל הבן הנמשך ממוח האב, שאפילו צפרני רגליו נתהוו מטיפה זו ממש,
+על ידי שהייתה תשעה חדשים בבטן האם, וירדה ממדרגה למדרגה, להשתנות ולהתהוות ממנה צפרנים.
+ועם כל זה, עודנה קשורה ומיוחדת ביחוד נפלא ועצום במהותה ועצמותה הראשון שהיתה טיפת מוח האב;
+וגם עכשיו בבן, יניקת הצפרנים וחיותם נמשכת מהמוח שבראש;
+כדאיתא בגמרא [נדה שם]: "לובן, שממנו גידים ועצמות וצפרנים" [וכמו שכתוב בעץ חיים שער החשמל, בסוד לבושים של אדם הראשון בגן עדן, שהיו צפרנים מבחינת מוח תבונה].
+וככה ממש, כביכול, בשרש כל הנפש רוח ונשמה של כללות ישראל למעלה,
+בירידתו ממדרגה למדרגה על ידי השתלשלות העולמות אצילות־בריאה־יצירה־עשייה מחכמתו יתברך, כדכתיב: "כולם בחכמה עשית",
+נתהוו ממנו נפש רוח ונשמה של עמי הארץ ופחותי הערך.
+ועם כל זה, עודינה קשורות ומיוחדות ביחוד נפלא ועצום במהותן ועצמותן הראשון, שהיא המשכת חכמה עילאה,
+כי יניקת וחיות נפש רוח ונשמה של עמי הארץ, הוא מנפש רוח ונשמה של הצדיקים והחכמים ראשי בני ישראל שבדורם:
+ובזה יובן מאמר רבותינו־זכרונם־לברכה על פסוק: "ולדבקה בו" – שכל הדבק בתלמידי חכמים, מעלה עליו הכתוב כאילו נדבק בשכינה ממש,
+כי על ידי דביקה בתלמידי חכמים, קשורות נפש רוח ונשמה של עמי הארץ ומיוחדות במהותן הראשון ושרשם שבחכמה עילאה,
+שהוא יתברך וחכמתו אחד, והוא המדע כו'.
+[והפושעים ומורדים בתלמידי חכמים – יניקת נפש רוח ונשמה שלהם מבחינת אחוריים של נפש רוח ונשמת תלמידי חכמים].
+ומה שכתוב בזהר ובזהר חדש, שהעיקר תלוי שיקדש עצמו בשעת תשמיש דווקא, מה שאין כן בני עמי הארץ כו',
+היינו, משום שאין לך נפש רוח ונשמה שאין לה לבוש מנפש דעצמות אביו ואמו,
+וכל המצות שעושה – הכל על ידי אותו הלבוש כו', ואפילו השפע שנותנים לו מן השמים – הכל על ידי לבוש זה,
+ואם יקדש את עצמו – ימשיך לבוש קדוש לנשמת בנו, ואפילו היא נשמה גדולה, צריכה לקידוש אביו כו'.
+אבל הנשמה עצמה, הנה לפעמים נשמת אדם גבוה לאין קץ, בא להיות בנו של אדם נבזה ושפל כו',
+כמו שכתב האר"י זכרונו לברכה כל זה ב"ליקוטי תורה" פרשת וירא ובטעמי מצות פרשת בראשית:
+</script>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const chapter = $('chapter').textContent.trim().split('\n');
+const topics = [[0,'הנפש השנית'],[2,'נשמות ישראל עלו במחשבה'],[5,'חכמתו יתברך'],[10,'מדרגות הנשמות'],[14,'השורש המשותף'],[16,'משל הבן והאב'],[21,'הקשר לשורש הנשמה'],[26,'דבקות בתלמידי חכמים'],[30,'הלבוש והנשמה']];
+const key = 'tanya-b-by-heart-v1';
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(key)) || {}; } catch {}
+let index = Number.isInteger(saved.index) && chapter[saved.index] ? saved.index : 0;
+const mastered = new Set(Array.isArray(saved.mastered) ? saved.mastered.filter(i => Number.isInteger(i) && chapter[i]) : []);
+let mode = 'read', review = false, revealed = false, hints = 0, words = [], blanks = [], active = null;
+const normalize = word => word.replace(/[^א-ת־]/g,'');
+function topic(i) { return topics.filter(([start]) => i >= start).at(-1)[1]; }
+function save() { try { localStorage.setItem(key, JSON.stringify({index,mastered:[...mastered]})); } catch {} }
+function message(value) { $('status').textContent = value; }
+function shuffle(values) {
+  const shuffled = [...values];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+function resetExercise() {
+  window.speechSynthesis?.cancel();
+  revealed = false; hints = 0; active = null;
+  words = chapter[index].split(' ');
+  const candidates = words.map((word, i) => [i, normalize(word)]).filter(([i, word]) => i > 0 && word.length >= 3).map(([i]) => i);
+  blanks = shuffle(candidates).slice(0, words.length < 12 ? 2 : 3).sort((a,b)=>a-b).map(i=>({i,solved:false}));
+  message('');
+  render();
+}
+function render() {
+  const count = mastered.size;
+  $('progress').max = chapter.length;
+  $('progress').value = count;
+  $('progressLabel').textContent = count + ' מתוך ' + chapter.length + ' מקטעים שדקלמת בלי עזרה';
+  $('sectionTitle').textContent = review ? 'כל הפרק ברצף' : topic(index);
+  $('counter').textContent = review ? '' : 'מקטע ' + (index + 1) + ' / ' + chapter.length;
+  $('jump').value = index;
+  $('review').setAttribute('aria-pressed', review);
+  $('review').textContent = review ? 'חזרה למקטע הנוכחי' : 'חזרה על כל הפרק';
+  for (const name of ['read','fill','say']) $(name+'Tab').setAttribute('aria-pressed', mode === name);
+  $('fillTab').disabled = review;
+  $('prev').disabled = review || index === 0;
+  $('next').disabled = review || index === chapter.length - 1;
+  $('listen').hidden = mode !== 'read';
+  $('hint').hidden = mode !== 'say' || revealed || (review ? hints >= chapter.length : hints >= words.length - 1);
+  $('reveal').hidden = mode !== 'say' || revealed;
+  $('retry').hidden = mode === 'read' || (mode === 'say' && !revealed && !hints);
+  $('master').hidden = mode !== 'say' || review || revealed || hints > 0;
+  $('master').disabled = mastered.has(index);
+  $('master').textContent = mastered.has(index) ? 'כבר סומן כלמדתי' : 'דקלמתי בלי עזרה';
+  $('instruction').textContent = mode === 'read' ? 'קרא בקול פעמיים. כשתהיה מוכן, עבור להשלמת מילים.' :
+    mode === 'fill' ? 'בחר מקום ריק ואז בחר את המילה החסרה.' : 'אמור בקול מהזיכרון. בסוף הצג את הנוסח ובדוק את עצמך.';
+  const box = $('reading');
+  box.replaceChildren();
+  $('choices').replaceChildren();
+  if (mode === 'fill') {
+    if (!blanks.some(blank => blank.i === active && !blank.solved)) active = blanks.find(blank=>!blank.solved)?.i ?? null;
+    words.forEach((word, i) => {
+      if (i) box.append(' ');
+      const blank = blanks.find(item => item.i === i);
+      if (!blank) { box.append(word); return; }
+      const button = document.createElement('button');
+      button.className = 'blank' + (blank.solved ? ' solved' : '');
+      button.textContent = blank.solved ? word : '⋯';
+      button.disabled = blank.solved;
+      button.setAttribute('aria-label',blank.solved ? word : 'מילה חסרה ' + (blanks.indexOf(blank)+1));
+      button.setAttribute('aria-pressed', active === i);
+      button.onclick = () => { active = i; message(''); render(); $('choices').querySelector('button')?.focus(); };
+      box.append(button);
+    });
+    if (active !== null) {
+      const answer = normalize(words[active]);
+      const options = [...new Set([...words.map(normalize), 'ישראל','נשמה','חכמה','ממש','יתברך'])].filter(word => word.length >= 3 && word !== answer);
+      for (const option of shuffle([answer,...shuffle(options).slice(0,3)])) {
+        const button = document.createElement('button');
+        button.textContent = option;
+        button.onclick = () => {
+          if (option !== answer) { message('נסה מילה אחרת.'); return; }
+          blanks.find(blank=>blank.i === active).solved = true;
+          const complete = blanks.every(blank=>blank.solved);
+          message(complete ? 'כל המילים במקום! עכשיו נסה לדקלם.' : 'נכון! עכשיו השלם את המילה הבאה.');
+          render();
+          if (complete) $('sayTab').focus();
+          else $('choices').querySelector('button')?.focus();
+        };
+        $('choices').append(button);
+      }
+    }
+  } else if (mode === 'read' || revealed) {
+    for (const line of review ? chapter : [chapter[index]]) {
+      const p = document.createElement('p'); p.textContent = line; box.append(p);
+    }
+  } else if (review && hints > 0) {
+    for (const line of chapter.slice(0,hints)) {
+      const p = document.createElement('p'); p.textContent = line.split(' ').slice(0,3).join(' ')+'…'; box.append(p);
+    }
+  } else if (hints > 0) {
+    box.textContent = words.slice(0,hints).join(' ') + '…';
+  } else {
+    box.textContent = 'נסה לומר את הנוסח בעל פה.';
+  }
+}
+function change(i) { index = i; review = false; save(); resetExercise(); }
+chapter.forEach((line,i) => {
+  const option = document.createElement('option');
+  option.value = i;
+  option.textContent = (i+1) + '. ' + line.split(' ').slice(0,4).join(' ') + '…';
+  $('jump').append(option);
+});
+for (const name of ['read','fill','say']) $(name+'Tab').onclick = () => { mode = name; resetExercise(); };
+$('jump').onchange = event => change(Number(event.target.value));
+$('prev').onclick = () => change(index-1);
+$('next').onclick = () => change(index+1);
+$('review').onclick = () => { review = !review; if (mode === 'fill') mode = 'read'; resetExercise(); };
+$('hint').onclick = () => { hints = review ? hints + 1 : Math.min(words.length-1, hints+2); render(); };
+$('reveal').onclick = () => { revealed = true; render(); $('retry').focus(); };
+$('retry').onclick = resetExercise;
+$('master').onclick = () => { mastered.add(index); save(); render(); message(mastered.size === chapter.length ? 'כל הכבוד! דקלמת את כל המקטעים.' : 'המקטע סומן. אפשר להמשיך למקטע הבא.'); };
+$('listen').onclick = () => {
+  if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) { message('הדפדפן הזה אינו תומך בהשמעה.'); return; }
+  const synth = window.speechSynthesis;
+  if (synth.speaking || synth.pending) { synth.cancel(); message(''); return; }
+  const voice = synth.getVoices().find(voice => /^he(?:-|_|$)/i.test(voice.lang) || /^iw(?:-|_|$)/i.test(voice.lang));
+  if (!voice) { message('כדי להשמיע, צריך להפעיל קול בעברית בהגדרות המכשיר.'); return; }
+  const utterance = new SpeechSynthesisUtterance(review ? chapter.join(' ') : chapter[index]);
+  utterance.voice = voice; utterance.lang = voice.lang; utterance.rate = .8;
+  utterance.onend = () => message('');
+  utterance.onerror = event => { if (!['canceled','interrupted'].includes(event.error)) message('ההשמעה לא הצליחה.'); };
+  synth.speak(utterance);
+  message('ההשמעה פועלת. לחץ שוב כדי לעצור.');
+};
+window.speechSynthesis?.getVoices();
+resetExercise();
+</script>
+</body>
+</html>

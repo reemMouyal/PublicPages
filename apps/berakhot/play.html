@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#171b39">
+<title>מַסָּע בְּעִקְבוֹת קְרִיאַת שְׁמַע</title>
+<style>
+:root{color-scheme:light;--ink:#202345;--muted:#535a73;--violet:#5943ae;--line:#e2def0;--paper:#faf8f5}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 Arial,sans-serif}button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #af5915;outline-offset:4px}button:disabled{cursor:default}header{background:#171b39;color:white}nav,.wrap{max-width:1080px;margin:auto;padding:0 22px}nav{display:flex;align-items:center;justify-content:space-between;min-height:68px;gap:12px}nav button{border:1px solid #777899;background:transparent;color:white;border-radius:12px;padding:7px 14px}.brand{font-weight:700}.hero{display:grid;grid-template-columns:1.15fr 1fr;gap:24px;align-items:center;padding:46px 0 34px}h1,h2,h3,p{margin:0 0 12px}h1{font-size:clamp(2.3rem,6vw,4rem);line-height:1.04;letter-spacing:-.055em}h2{font-size:clamp(1.55rem,4vw,2.35rem);line-height:1.2}.hero p{color:#eeebff}.eyebrow{font-weight:700;font-size:.86rem;color:#ffd893}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.btn{border:1px solid transparent;background:var(--violet);color:white;border-radius:12px;padding:10px 18px;font-weight:700}.btn.gold{background:#ffd585;color:#27203c}.btn.alt{background:white;color:var(--violet);border-color:var(--line)}.hero .alt{background:transparent;color:white;border-color:#8684ad}.scene{height:210px;position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(150deg,#352c73,#7561ae 58%,#f7a77a);color:white;isolation:isolate}.scene:before,.scene:after{content:"";position:absolute;bottom:-45%;width:95%;height:90%;border-radius:50%;background:#29264c;transform:rotate(15deg);z-index:-1}.scene:after{left:-16%;bottom:-48%;background:#1c2040;transform:rotate(-15deg)}.scene .art{position:absolute;font-size:70px;top:20px;right:22%;filter:drop-shadow(0 8px 16px #271e5c55)}.scene .art2{position:absolute;font-size:66px;left:17%;bottom:18px}.scene .stars{position:absolute;top:12px;left:10%;letter-spacing:13px;color:#ffe4b5}.lite{background:linear-gradient(145deg,#6758a5,#ef9f85,#ffd894)}main{padding:26px 0 54px}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:16px}.tile,.panel,.answer,.stat{background:white;border:1px solid var(--line);border-radius:17px}.tile{text-align:right;color:inherit;padding:16px;display:grid;gap:5px}.tile:hover,.choice:hover:enabled{border-color:#8064cf;background:#f8f5ff}.tile .icon{font-size:32px}.tile small,.muted{color:var(--muted)}.panel{padding:clamp(17px,4vw,30px);max-width:850px;margin:auto}.panel .scene{height:150px;margin:12px 0 18px}.panel .scene .art{top:0}.panel .scene .art2{bottom:2px}.stat{padding:14px 17px;margin:18px 0;display:flex;align-items:center;gap:14px;flex-wrap:wrap}.bar{flex:1;min-width:100px;height:8px;background:#ebe5fa;border-radius:8px;overflow:hidden}.bar span{height:100%;display:block;background:#7556cf;border-radius:8px}.list{display:grid;gap:9px;margin-top:16px}.choice,.answer,summary{padding:12px 15px;text-align:right}.choice{border:1px solid var(--line);border-radius:12px;background:white;color:var(--ink);width:100%}.choice.good,.feedback.good{background:#e2f6eb;border-color:#75b691;color:#164b36}.choice.bad,.feedback.bad{background:#fff0e8;border-color:#d39a78;color:#763d21}.feedback{padding:12px 15px;border:1px solid;border-radius:12px;margin-top:14px}.answer p{margin:0;padding:0 15px 12px}.answer{padding:0}summary{cursor:pointer;font-weight:700}.timeline{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.timeline span{background:#f0ebfc;padding:7px 11px;border-radius:8px}.swatch{display:inline-block;width:16px;height:16px;border:1px solid #66728c;border-radius:4px;vertical-align:middle}.note{font-size:.94rem;margin-top:16px}.review{padding:10px 0;border-top:1px solid var(--line)}.review p{margin:2px 0 0}.score{font-size:2.8rem;font-weight:800;color:var(--violet)}[hidden]{display:none!important}@media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}.hero{grid-template-columns:1fr;padding-top:26px}.hero .scene{height:150px}.hero .scene .art{top:0}.hero .scene .art2{bottom:0}}@media(prefers-reduced-motion:no-preference){.tile,.choice{transition:background .15s,border-color .15s}}
+.listen{background:#eee9fb;border:1px solid #d1c5ed;color:#35246a;border-radius:12px;padding:8px 12px;margin:4px;font:inherit}.option-row{display:grid;grid-template-columns:1fr auto;align-items:center}.answer .listen{margin:6px 12px}#voice-status{color:#66381d} </style>
+<body>
+<header><nav><div class="brand">📖 &nbsp; מַסָּע בְּעִקְבוֹת קְרִיאַת שְׁמַע</div><button id="home">דַּף הַבַּיִת</button></nav><div class="wrap" id="intro"></div></header>
+<div class="wrap"><main id="app"></main></div>
+<script>
+const topics=[
+ {name:'שְׁמַע שֶׁל עַרְבִית',letter:'א׳',art:'🌙',side:'✨',visual:'<span>✨ צֵאת הַכּוֹכָבִים</span><span>⅓ סוֹף אַשְׁמוּרָה רִאשׁוֹנָה</span><span>½ חֲצוֹת הַלַּיְלָה</span><span>🌅 עֲלוֹת הַשַּׁחַר</span>'},
+ {name:'שְׁמַע שֶׁל שַׁחֲרִית',letter:'ב׳',art:'🌅',side:'👑',visual:'<span><i class="swatch" style="background:#69acec"></i> תְּכֵלֶת</span><span><i class="swatch" style="background:white"></i> לָבָן</span><span><i class="swatch" style="background:#53a27f"></i> כַּרְתִּי (יָרֹק)</span><span>☀️ הָנֵץ הַחַמָּה הוּא הַזְּרִיחָה</span>'},
+ {name:'בֵּית שַׁמַּאי וּבֵית הִלֵּל',letter:'ג׳',art:'🚶',side:'🛤️',visual:'<span>בֵּית שַׁמַּאי · תְּנוּחַת הַגּוּף</span><span>בֵּית הִלֵּל · זְמַנֵּי שְׁכִיבָה וְקִימָה</span>'},
+ {name:'בִּרְכוֹת קְרִיאַת שְׁמַע',letter:'ד׳',art:'📖',side:'☀️',visual:'<span>☀️ שַׁחֲרִית · שְׁתַּיִם לִפְנֵי + 1 אַחֲרֵי</span><span>🌙 עַרְבִית · שְׁתַּיִם לִפְנֵי + 2 אַחֲרֵי</span>'},
+ {name:'זְכִירַת יְצִיאַת מִצְרַיִם',letter:'ה׳',art:'🏜️',side:'🌙',visual:'<span>בֶּן זוֹמָא · יָמִים וְלֵילוֹת</span><span>חֲכָמִים · הָעוֹלָם הַזֶּה וִימוֹת הַמָּשִׁיחַ</span>'}
+];
+// Each row holds its source topic, recall prompt, model answer and quiz choices.
+const bank=[
+ [0,'מִמָּתַי קוֹרְאִים קְרִיאַת שְׁמַע שֶׁל עַרְבִית?','מִצֵּאת הַכּוֹכָבִים, כְּשֶׁהַכֹּהֲנִים שֶׁנִּטְהֲרוּ נִכְנָסִים לֶאֱכֹל בִּתְרוּמָתָם.','מִצֵּאת הַכּוֹכָבִים','מִשְּׁקִיעַת הַחַמָּה','מֵחֲצוֹת הַלַּיְלָה'],
+ [0,'לָמָּה כֹּהֵן שֶׁהָיָה טָמֵא מְחַכֶּה לְצֵאת הַכּוֹכָבִים כְּדֵי לֶאֱכֹל תְּרוּמָה?','הַכֹּהֵן טוֹבֵל בַּמִּקְוֶה, וּלְאַחַר הַטְּבִילָה מְחַכֶּה לְצֵאת הַכּוֹכָבִים כְּדֵי לֶאֱכֹל תְּרוּמָה.','עָלָיו לִטְבֹּל בַּמִּקְוֶה וּלְהַמְתִּין לְצֵאת הַכּוֹכָבִים','עָלָיו לְהִתְפַּלֵּל עַרְבִית לִפְנֵי הַטְּבִילָה','זְמַן אֲכִילַת הַתְּרוּמָה מַתְחִיל תָּמִיד בַּחֲצוֹת'],
+ [0,'עַד מָתַי קוֹרְאִים קְרִיאַת שְׁמַע שֶׁל עַרְבִית לְפִי שָׁלוֹשׁ הַדֵּעוֹת?','רַבִּי אֱלִיעֶזֶר — עַד סוֹף הָאַשְׁמוּרָה הָרִאשׁוֹנָה. חֲכָמִים — עַד חֲצוֹת הַלַּיְלָה. רַבָּן גַּמְלִיאֵל — עַד עֲלוֹת הַשַּׁחַר.','רַבִּי אֱלִיעֶזֶר: סוֹף אַשְׁמוּרָה רִאשׁוֹנָה, חֲכָמִים: חֲצוֹת, רַבָּן גַּמְלִיאֵל: עֲלוֹת הַשַּׁחַר','רַבִּי אֱלִיעֶזֶר: חֲצוֹת, חֲכָמִים: עֲלוֹת הַשַּׁחַר, רַבָּן גַּמְלִיאֵל: סוֹף אַשְׁמוּרָה רִאשׁוֹנָה','שָׁלוֹשׁ הַדֵּעוֹת מַסְכִּימוֹת שֶׁקּוֹרְאִים עַד חֲצוֹת'],
+ [0,'בָּנָיו שֶׁל רַבָּן גַּמְלִיאֵל חָזְרוּ מִן הַמִּשְׁתֶּה בְּלִי שֶׁקָּרְאוּ שְׁמַע. מָה אָמַר לָהֶם אֲבִיהֶם?','אִם עֲדַיִן לֹא עָלָה הַשַּׁחַר, חַיָּבִים לִקְרֹא קְרִיאַת שְׁמַע שֶׁל עַרְבִית.','אִם עֲדַיִן לֹא עָלָה הַשַּׁחַר, חַיָּבִים לִקְרֹא','מִשֶּׁעָבַר חֲצוֹת, מְחַכִּים לְשַׁחֲרִית','עֲלֵיהֶם לִקְרֹא פַּעֲמַיִם בְּשַׁחֲרִית'],
+ [0,'לְכַמָּה אַשְׁמוּרוֹת מִתְחַלֵּק הַלַּיְלָה לְפִי דַּף הַחֲזָרָה?','לְשָׁלוֹשׁ אַשְׁמוּרוֹת, כְּלוֹמַר שְׁלוֹשָׁה חֲלָקִים בַּלַּיְלָה.','שָׁלוֹשׁ אַשְׁמוּרוֹת','שְׁתֵּי אַשְׁמוּרוֹת','אַרְבַּע אַשְׁמוּרוֹת'],
+ [0,'מַדּוּעַ אָמְרוּ חֲכָמִים שֶׁזְּמַן שְׁמַע שֶׁל עַרְבִית הוּא עַד חֲצוֹת?','כְּדֵי לְהַרְחִיק אֶת הָאָדָם מִן הָעֲבֵרָה. אִם יַקְדִּים לִקְרֹא, יִקְטַן הַסִּכּוּי שֶׁיִּשְׁכַּח וְיַעֲבֹר זְמַן הַקְּרִיאָה.','כְּדֵי לְהַרְחִיק אֶת הָאָדָם מִן הָעֲבֵרָה','כִּי בַּעֲלוֹת הַשַּׁחַר מַתְחִילָה הָאַשְׁמוּרָה הָרִאשׁוֹנָה','כִּי הַכֹּהֲנִים יְכוֹלִים לֶאֱכֹל תְּרוּמָה רַק בַּחֲצוֹת'],
+ [1,'כֵּיצַד יוֹדְעִים שֶׁהִגִּיעַ זְמַן שְׁמַע שֶׁל שַׁחֲרִית לְפִי תַּנָּא קַמָּא וּלְפִי רַבִּי אֱלִיעֶזֶר?','לְתַנָּא קַמָּא, כְּשֶׁיֵּשׁ מַסְפִּיק אוֹר לְהַבְחִין בֵּין תְּכֵלֶת לְלָבָן. לְרַבִּי אֱלִיעֶזֶר, כְּשֶׁאֶפְשָׁר לְהַבְחִין בֵּין תְּכֵלֶת לְכַרְתִּי, שֶׁהוּא יָרֹק.','תַּנָּא קַמָּא: תְּכֵלֶת וְלָבָן. רַבִּי אֱלִיעֶזֶר: תְּכֵלֶת וְכַרְתִּי','תַּנָּא קַמָּא: תְּכֵלֶת וְכַרְתִּי. רַבִּי אֱלִיעֶזֶר: תְּכֵלֶת וְלָבָן','שְׁנֵיהֶם אוֹמְרִים שֶׁרַק אַחֲרֵי הַזְּרִיחָה'],
+ [1,'עַד מָתַי קוֹרְאִים שְׁמַע בְּשַׁחֲרִית לְפִי תַּנָּא קַמָּא וּלְפִי רַבִּי יְהוֹשֻׁעַ?','לְתַנָּא קַמָּא, עַד הָנֵץ הַחַמָּה. לְרַבִּי יְהוֹשֻׁעַ, עַד שָׁלוֹשׁ שָׁעוֹת מִתְּחִלַּת הַיּוֹם לְפִי מִנְיַן שָׁעוֹת הַיּוֹם.','תַּנָּא קַמָּא: הָנֵץ הַחַמָּה. רַבִּי יְהוֹשֻׁעַ: שָׁלוֹשׁ שָׁעוֹת','תַּנָּא קַמָּא: שָׁלוֹשׁ שָׁעוֹת. רַבִּי יְהוֹשֻׁעַ: הָנֵץ הַחַמָּה','לְפִי שְׁנֵיהֶם עַד חֲצוֹת הַיּוֹם'],
+ [1,'מִי נוֹהֲגִים לָקוּם בַּשָּׁעָה הַשְּׁלִישִׁית לְפִי הַמִּשְׁנָה?','בְּנֵי מְלָכִים. לְפִי רַבִּי יְהוֹשֻׁעַ, שְׁעַת קִימָתָם מְלַמֶּדֶת שֶׁגַּם זוֹ שְׁעַת קִימָה.','בְּנֵי מְלָכִים','הַכֹּהֲנִים','שׁוֹמְרֵי הַלַּיְלָה'],
+ [1,'מָה יַעֲשֶׂה מִי שֶׁעָבַר אֶצְלוֹ סוֹף זְמַן קְרִיאַת שְׁמַע שֶׁל שַׁחֲרִית?','יִקְרָא בְּכָל זֹאת. הוּא מְקַבֵּל שְׂכַר כְּמִי שֶׁקּוֹרֵא בַּתּוֹרָה, וְאֶת מִצְוַת קְרִיאַת שְׁמַע בִּזְמַנָּה כְּבָר לֹא קִיֵּם.','יִקְרָא וְיִזְכֶּה בִּשְׂכַר כְּקוֹרֵא בַּתּוֹרָה','יַמְתִּין עַד הָעֶרֶב','יִקְרָא וְיֵחָשֵׁב כְּאִלּוּ קָרָא בַּזְּמַן'],
+ [2,'אֵיךְ מְפָרְשִׁים בֵּית שַׁמַּאי וּבֵית הִלֵּל אֶת ״וּבְשָׁכְבְּךָ וּבְקוּמֶךָ״?','בֵּית שַׁמַּאי מְפָרְשִׁים לְפִי תְּנוּחַת הַגּוּף: בָּעֶרֶב מַטִּים אֶת הַגּוּף, וּבַבֹּקֶר עוֹמְדִים. בֵּית הִלֵּל מְפָרְשִׁים לְפִי הַזְּמַן: בָּעֶרֶב בַּשָּׁעָה שֶׁאֲנָשִׁים שׁוֹכְבִים, וּבַבֹּקֶר בַּשָּׁעָה שֶׁהֵם קָמִים. כָּל אָדָם קוֹרֵא כְּדַרְכּוֹ.','בֵּית שַׁמַּאי: תְּנוּחַת הַגּוּף. בֵּית הִלֵּל: זְמַן הַקְּרִיאָה','בֵּית שַׁמַּאי: זְמַן הַקְּרִיאָה. בֵּית הִלֵּל: תְּנוּחַת הַגּוּף','שְׁנֵיהֶם מְחַיְּבִים לִקְרֹא בִּשְׁכִיבָה בָּעֶרֶב וּבַעֲמִידָה בַּבֹּקֶר'],
+ [2,'מִנְיַן לוֹמְדִים בֵּית הִלֵּל שֶׁאֶפְשָׁר לִקְרֹא גַּם תּוֹךְ כְּדֵי הֲלִיכָה?','מֵהַמִּלִּים ״וּבְלֶכְתְּךָ בַדֶּרֶךְ״. מִכָּאן שֶׁאֶפְשָׁר לִקְרֹא כְּדַרְכּוֹ גַּם בַּהֲלִיכָה.','״וּבְלֶכְתְּךָ בַדֶּרֶךְ״','״וּבְקוּמֶךָ״','״כָּל יְמֵי חַיֶּיךָ״'],
+ [2,'מָה עָשָׂה רַבִּי טַרְפוֹן בַדֶּרֶךְ, וּמָה הֵשִׁיבוּ לוֹ חֲכָמִים?','רַבִּי טַרְפוֹן הִטָּה אֶת גּוּפוֹ לִקְרֹא כְּדִבְרֵי בֵּית שַׁמַּאי, וְהִסְתַּכֵּן מִפְּנֵי שׁוֹדְדִים. חֲכָמִים אָמְרוּ לוֹ שֶׁעָבַר עַל דִּבְרֵי בֵּית הִלֵּל כְּשֶׁעָשָׂה כָּךְ.','הִטָּה לִקְרֹא כְּבֵית שַׁמַּאי וְהִסְתַּכֵּן. חֲכָמִים אָמְרוּ שֶׁעָבַר עַל דִּבְרֵי בֵּית הִלֵּל','קָרָא בַּהֲלִיכָה כְּבֵית הִלֵּל. חֲכָמִים אָמְרוּ שֶׁהָיָה חַיָּב לְהַטּוֹת','וִתֵּר עַל הַקְּרִיאָה. חֲכָמִים אָמְרוּ שֶׁיִּקְרָא רַק בְּשַׁחֲרִית'],
+ [3,'כַּמָּה בְּרָכוֹת מְבָרְכִים לִפְנֵי וְאַחֲרֵי קְרִיאַת שְׁמַע בְּשַׁחֲרִית וּבְעַרְבִית?','בְּשַׁחֲרִית שְׁתַּיִם לִפְנֵי (יוֹצֵר אוֹר וְאַהֲבַת עוֹלָם לְפִי דַּף הַחֲזָרָה) וְאַחַת אַחֲרֵי (אֱמֶת וְיַצִּיב). בְּעַרְבִית שְׁתַּיִם לִפְנֵי (הַמַּעֲרִיב עֲרָבִים וְאַהֲבַת עוֹלָם) וּשְׁתַּיִם אַחֲרֵי (אֱמֶת וֶאֱמוּנָה וְהַשְׁכִּיבֵנוּ).','שַׁחֲרִית: שְׁתַּיִם לִפְנֵי וְאַחַת אַחֲרֵי. עַרְבִית: שְׁתַּיִם לִפְנֵי וּשְׁתַּיִם אַחֲרֵי','שַׁחֲרִית: אַחַת לִפְנֵי וּשְׁתַּיִם אַחֲרֵי. עַרְבִית: שְׁתַּיִם לִפְנֵי וְאַחַת אַחֲרֵי','בְּשַׁחֲרִית וּבְעַרְבִית: שְׁתַּיִם לִפְנֵי וְאַחַת אַחֲרֵי'],
+ [3,'אֵיךְ מַסְבִּיר דַּף הַחֲזָרָה בְּרָכָה אֲרֻכָּה וּקְצָרָה?','לְפִי הַהֶסְבֵּר בַּדַּף, בְּרָכָה אֲרֻכָּה פּוֹתַחַת וְחוֹתֶמֶת ב״בָּרוּךְ אַתָּה״, וְהַקְּצָרָה אֵינָהּ פּוֹתַחַת כָּךְ. שׁוֹמְרִים עַל הַנֹּסַח שֶׁקָּבְעוּ חֲכָמִים: אֵין לְקַצֵּר בְּמָקוֹם שֶׁאָמְרוּ לְהַאֲרִיךְ וְאֵין לְהַאֲרִיךְ בְּמָקוֹם שֶׁאָמְרוּ לְקַצֵּר.','לְפִי הַדַּף, אֲרֻכָּה פּוֹתַחַת וְחוֹתֶמֶת ב״בָּרוּךְ אַתָּה״ וְהַקְּצָרָה אֵינָהּ פּוֹתַחַת כָּךְ','לְפִי הַדַּף, אֲרֻכָּה הִיא כָּל בְּרָכָה שֶׁיֵּשׁ בָּהּ יוֹתֵר מֵעֶשֶׂר מִלִּים','אֶפְשָׁר לְקַצֵּר אוֹ לְהַאֲרִיךְ לְפִי הַזְּמַן שֶׁיֵּשׁ לַמִּתְפַּלֵּל'],
+ [4,'לְפִי דַּף הַחֲזָרָה, לָמָּה חֲכָמִים סוֹבְרִים שֶׁאֵין אוֹמְרִים אֶת פָּרָשַׁת ״וַיֹּאמֶר״ בַּלַּיְלָה?','פָּרָשַׁת ״וַיֹּאמֶר״ הִיא פָּרָשַׁת צִיצִית וּבָהּ מֻזְכֶּרֶת יְצִיאַת מִצְרַיִם. לְפִי הַהֶסְבֵּר בַּדַּף, לַיְלָה אֵינוֹ זְמַן מִצְוַת צִיצִית, וְלָכֵן לְשִׁיטָתָם אֵין אוֹמְרִים אֶת הַפָּרָשָׁה בַּלַּיְלָה.','כִּי פָּרָשַׁת ״וַיֹּאמֶר״ עוֹסֶקֶת בְּצִיצִית וְלַיְלָה אֵינוֹ זְמַן צִיצִית','כִּי יְצִיאַת מִצְרַיִם אֵינָהּ מֻזְכֶּרֶת בְּפָרָשַׁת ״וַיֹּאמֶר״','כִּי ״וַיֹּאמֶר״ הִיא אַחַת מִבִּרְכוֹת קְרִיאַת שְׁמַע'],
+ [4,'מָה לוֹמֵד בֶּן זוֹמָא מֵהַמִּלָּה ״כָּל״ ב״כָּל יְמֵי חַיֶּיךָ״?','״יְמֵי חַיֶּיךָ״ מְרַמֵּז לַיָּמִים, וְהַמִּלָּה ״כָּל״ מוֹסִיפָה אֶת הַלֵּילוֹת לִזְכִירַת יְצִיאַת מִצְרַיִם.','מַזְכִּירִים אֶת יְצִיאַת מִצְרַיִם גַּם בַּלֵּילוֹת','מַזְכִּירִים רַק בִּימוֹת הַמָּשִׁיחַ','מַזְכִּירִים רַק בְּחַג הַפֶּסַח'],
+ [4,'אֵיךְ דּוֹרְשִׁים חֲכָמִים אֶת ״כָּל יְמֵי חַיֶּיךָ״?','״יְמֵי חַיֶּיךָ״ הֵם הָעוֹלָם הַזֶּה, וְהַמִּלָּה ״כָּל״ מוֹסִיפָה אֶת יְמוֹת הַמָּשִׁיחַ לִזְכִירַת יְצִיאַת מִצְרַיִם.','״יְמֵי חַיֶּיךָ״ — הָעוֹלָם הַזֶּה. ״כָּל״ — גַּם יְמוֹת הַמָּשִׁיחַ','״יְמֵי חַיֶּיךָ״ — לֵילוֹת. ״כָּל״ — גַּם יָמִים','״יְמֵי חַיֶּיךָ״ — יְמוֹת הַמָּשִׁיחַ בִּלְבַד. ״כָּל״ — הָעוֹלָם הַזֶּה בִּלְבַד']
+];
+const app=document.querySelector('#app'), intro=document.querySelector('#intro');
+let progress={};try{progress=JSON.parse(localStorage.getItem('berakhot-lab-v1')||'{}')||{}}catch{}
+let session;
+const order=bank.map((_,i)=>i);
+const byTopic=t=>order.filter(i=>bank[i][0]===t);
+function shuffle(values){const copy=[...values];for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]]}return copy}
+const voiceEngine=window.speechSynthesis;
+let approvedVoice=null;
+let speakingButton=null;
+function stopVoice(){if(speakingButton){speakingButton.textContent=speakingButton.dataset.label;speakingButton=null}voiceEngine?.cancel()}
+function listenButton(label,message){
+ const b=document.createElement('button');b.className='listen';b.type='button';b.dataset.label='🔊 '+label;b.textContent=b.dataset.label;
+ b.onclick=()=>{const stopping=speakingButton===b;stopVoice();if(stopping)return;
+ const status=document.querySelector('#voice-status');
+ if(!voiceEngine){status.textContent='הַהַקְרָאָה דּוֹרֶשֶׁת דַּפְדְּפָן עִם תְּמִיכָה בְּקוֹל עִבְרִי.';return}
+ const hebrew=voiceEngine.getVoices().filter(v=>/^(he|iw)([-_]|$)/i.test(v.lang));
+ let saved;try{saved=localStorage.getItem("approved-hebrew-male")}catch{}
+ const voice=hebrew.find(v=>v.voiceURI===(approvedVoice||saved)) || hebrew.find(v=>/^(he|iw)([-_]|$)/i.test(v.lang) && /(?:\bAvri\b|אבְ?רִ?י|\bAsaf\b|\bAsafNeural\b|\bAvriNeural\b|\bmale\b|זכר)/i.test(v.name));
+ if(!voice){status.textContent='כְּדֵי לִשְׁמֹעַ קוֹל שֶׁל גֶּבֶר, יֵשׁ לִבְחֹר דַּפְדְּפָן אוֹ מַכְשִׁיר שֶׁמַּצִּיעַ קוֹל עִבְרִי גַּבְרִי, כְּגוֹן Microsoft Avri.';for(const candidate of hebrew){
+ const preview=document.createElement('button');preview.className='listen';preview.textContent='הַשְׁמָעַת דֻּגְמָה · '+candidate.name;
+ preview.onclick=()=>{stopVoice();const sample=new SpeechSynthesisUtterance('שָׁלוֹם יְלָדִים. הַיּוֹם נִלְמַד קְרִיאַת שְׁמַע.');sample.voice=candidate;sample.lang='he-IL';voiceEngine.speak(sample);
+ const accept=document.createElement('button');accept.className='listen';accept.textContent='זֶה קוֹל שֶׁל גֶּבֶר · בְּחִירָה';accept.onclick=()=>{approvedVoice=candidate.voiceURI;try{localStorage.setItem("approved-hebrew-male",approvedVoice)}catch{};b.click()};status.replaceChildren(preview,accept)};
+ status.append(preview)
+ }return}
+ const words=message;
+ const speech=new SpeechSynthesisUtterance(words);speech.lang='he-IL';if(voice)speech.voice=voice;speech.rate=.84;
+ speakingButton=b;b.textContent='⏹ עֲצִירָה';status.textContent='';
+ function done(){if(speakingButton===b){b.textContent=b.dataset.label;speakingButton=null}}
+ speech.onend=done;speech.onerror=e=>{if(!['interrupted','canceled'].includes(e.error)){status.textContent='הַהַקְרָאָה לֹא הִצְלִיחָה. בִּדְקוּ שֶׁקּוֹל עִבְרִי זָמִין בַּמַּכְשִׁיר.'}done()};voiceEngine.speak(speech)
+ };return b
+}
+voiceEngine?.getVoices();
+function voiceStatus(){app.insertAdjacentHTML('afterbegin','<div id="voice-status" role="status"></div>')}
+function mount(html){stopVoice();intro.innerHTML='';app.innerHTML=html;window.scrollTo(0,0);const heading=app.querySelector('h1,h2');heading?.setAttribute('tabindex','-1');heading?.focus({preventScroll:true})}
+function scene(topic){return '<div class="scene '+([topics[1],topics[3],topics[4]].includes(topic)?'lite':'')+'" aria-hidden="true"><span class="stars">✦ · ✧ · ✦</span><span class="art">'+topic.art+'</span><span class="art2">'+topic.side+'</span></div>'}
+function home(){
+ session=null;const learned=order.filter(i=>progress[i]===true).length, mistakes=order.filter(i=>progress[i]===false);
+ mount('<h2>בּוֹחֲרִים מִשְׁנָה לְתִרְגּוּל</h2><div class="grid">'+topics.map((t,i)=>'<button class="tile" data-study="'+i+'"><span class="icon" aria-hidden="true">'+t.art+'</span><small>מִשְׁנָה '+t.letter+'</small><strong>'+t.name+'</strong><small>'+byTopic(i).length+' שְׁאֵלוֹת</small></button>').join('')+'</div><div class="stat"><strong>'+learned+' מִתּוֹךְ 18 נֶעֱנוּ נָכוֹן בַּנִּסָּיוֹן הָאַחֲרוֹן</strong><div class="bar" role="progressbar" aria-label="הִתְקַדְּמוּת" aria-valuenow="'+learned+'" aria-valuemax="18"><span style="width:'+(learned/18*100)+'%"></span></div>'+(mistakes.length?'<button class="btn alt" id="mistakes">חֲזָרָה עַל טָעֻיּוֹת ('+mistakes.length+')</button>':'')+'</div>');
+ intro.innerHTML='<section class="hero"><div><p class="eyebrow">מַסֶּכֶת בְּרָכוֹת · פֶּרֶק א׳</p><h1>מַסָּע בְּעִקְבוֹת<br>קְרִיאַת שְׁמַע</h1><p>לוֹמְדִים אֶת חָמֵשׁ הַמִּשְׁנָיוֹת, מְתַרְגְּלִים בַּקֶּצֶב שֶׁלָּכֶם וְנִגָּשִׁים לְמִבְחַן דֶּמֶה עִם 18 שְׁאֵלוֹת.</p><div class="actions"><button class="btn gold" id="start">מַתְחִילִים לִלְמֹד</button><button class="btn alt" id="exam">מִבְחָן דֶּמֶה</button></div></div>'+scene({art:'🌙',side:'📖'})+'</section>';
+ document.querySelector('#start').onclick=()=>study(0);
+ document.querySelector('#exam').onclick=()=>start(shuffle(order),true);
+ document.querySelector('#mistakes')?.addEventListener('click',()=>start(mistakes,false));
+ app.querySelectorAll('[data-study]').forEach(button=>button.onclick=()=>study(Number(button.dataset.study)));
+}
+function study(index){
+ const topic=topics[index], ids=byTopic(index);
+ mount('<section class="panel"><p class="muted">מִשְׁנָה '+topic.letter+'</p><h2>'+topic.name+'</h2>'+scene(topic)+'<div class="timeline">'+topic.visual+'</div><p>נַסּוּ לַעֲנוֹת בְּקוֹל, וְאָז פִּתְחוּ כָּל שְׁאֵלָה וּבִדְקוּ אֶת הַתְּשׁוּבָה.</p><div class="list">'+ids.map(i=>'<details class="answer"><summary>'+bank[i][1]+'</summary><p>'+bank[i][2]+'</p></details>').join('')+'</div>'+(index===2?'<p class="note">בִּשְׁאֵלָה 13 בַּדַּף הַחֲזָרָה נָפְלָה טָעוּת בְּשֵׁם הַדֵּעָה. רַבִּי טַרְפוֹן הִטָּה כְּדִבְרֵי בֵּית שַׁמַּאי, כְּפִי שֶׁמּוֹפִיעַ ב<a href="https://he.wikisource.org/wiki/משנה_ברכות_א_ג" target="_blank" rel="noopener">מִשְׁנָה בִּרְכוֹת א׳, ג׳</a>.</p>':'')+'<div class="actions"><button class="btn" id="practice">תִּרְגּוּל לַמִּשְׁנָה</button>'+(index<topics.length-1?'<button class="btn alt" id="next-topic">לַמִּשְׁנָה הַבָּאָה</button>':'')+'</div></section>');
+ voiceStatus();
+ app.querySelectorAll('details').forEach((card,j)=>{const row=bank[ids[j]];card.before(listenButton('שְׁמִיעַת הַשְּׁאֵלָה',row[1]));card.append(listenButton('שְׁמִיעַת הַתְּשׁוּבָה',row[2]))});
+ document.querySelector('#practice').onclick=()=>start(ids,false);
+ document.querySelector('#next-topic')?.addEventListener('click',()=>study(index+1));
+}
+function start(ids,exam){session={ids,exam,pos:0,results:[]};question()}
+function question(){
+ const {ids,pos,exam}=session, id=ids[pos], row=bank[id], topic=topics[row[0]];
+ const choices=shuffle([3,4,5]);
+ mount('<section class="panel"><div class="stat"><strong>'+(exam?'מִבְחָן דֶּמֶה':'תִּרְגּוּל')+' · שְׁאֵלָה '+(pos+1)+' מִתּוֹךְ '+ids.length+'</strong><div class="bar" role="progressbar" aria-label="שְׁאֵלוֹת שֶׁנֶּעֱנוּ" aria-valuenow="'+pos+'" aria-valuemax="'+ids.length+'"><span style="width:'+(pos/ids.length*100)+'%"></span></div></div><p class="muted">'+topic.name+'</p><h2>'+row[1]+'</h2><div class="list">'+choices.map(n=>'<button class="choice" data-choice="'+n+'">'+row[n]+'</button>').join('')+'</div><div id="feedback" role="status"></div><div class="actions"><button class="btn" id="next" hidden>'+(pos+1===ids.length?'לְסִכּוּם':'לַשְּׁאֵלָה הַבָּאָה')+'</button></div></section>');
+ const next=document.querySelector('#next'), buttons=[...app.querySelectorAll('[data-choice]')];
+ voiceStatus();app.querySelector('h2').after(listenButton('שְׁמִיעַת הַשְּׁאֵלָה',row[1]));
+ for(const [j,button] of buttons.entries()){const box=document.createElement('div');box.className='option-row';button.before(box);box.append(button,listenButton('אֶפְשָׁרוּת '+['א׳','ב׳','ג׳'][j],row[button.dataset.choice]))}
+ for(const button of buttons)button.onclick=()=>{
+   const pick=Number(button.dataset.choice), correct=pick===3;
+   session.results.push({id,pick,correct});progress[id]=correct;
+   try{localStorage.setItem('berakhot-lab-v1',JSON.stringify(progress))}catch{}
+   buttons.forEach(b=>{b.disabled=true;if(!exam&&Number(b.dataset.choice)===3)b.classList.add('good')});
+   if(!exam&&!correct)button.classList.add('bad');
+   document.querySelector('#feedback').innerHTML=exam?'<p class="muted">הַתְּשׁוּבָה נִרְשְׁמָה.</p>':'<div class="feedback '+(correct?'good':'bad')+'"><strong>'+(correct?'תְּשׁוּבָה נְכוֹנָה!':'הִנֵּה הַתְּשׁוּבָה הַנְּכוֹנָה')+'</strong><div>'+row[2]+'</div></div>';
+   stopVoice();if(!exam)document.querySelector('#feedback').append(listenButton('שְׁמִיעַת הַהֶסְבֵּר',row[2]));
+   next.hidden=false;next.focus();
+ };
+ next.onclick=()=>{session.pos++;if(session.pos===ids.length)finish();else question()};
+}
+function finish(){
+ const {results,exam}=session, errors=results.filter(r=>!r.correct);
+ mount('<section class="panel"><h2>'+(exam?'תּוֹצְאוֹת מִבְחָן הַדֶּמֶה':'סִכּוּם הַתִּרְגּוּל')+'</h2><div class="score">'+(results.length-errors.length)+' / '+results.length+'</div><p>'+(errors.length?'כְּדַאי לַחֲזֹר עַל הַשְּׁאֵלוֹת הַבָּאוֹת.':'כָּל הַתְּשׁוּבוֹת נְכוֹנוֹת!')+'</p>'+errors.map(({id,pick})=>'<div class="review"><strong>'+bank[id][1]+'</strong><p class="muted">הַתְּשׁוּבָה שֶׁבְּחַרְתֶּם: '+bank[id][pick]+'</p><p>'+bank[id][2]+'</p></div>').join('')+'<div class="actions">'+(errors.length?'<button class="btn" id="retry">לְתַרְגֵּל אֶת הַטָּעֻיּוֹת</button>':'')+'<button class="btn alt" id="back">לְדַף הַבַּיִת</button></div></section>');
+ voiceStatus();app.querySelectorAll('.review').forEach((card,j)=>{const row=bank[errors[j].id];card.append(listenButton('שְׁמִיעַת הַשְּׁאֵלָה',row[1]),listenButton('שְׁמִיעַת הַתְּשׁוּבָה',row[2]))});
+ document.querySelector('#retry')?.addEventListener('click',()=>start(errors.map(r=>r.id),false));
+ document.querySelector('#back').onclick=home;
+}
+document.querySelector('#home').onclick=home;
+home();
+</script>
+</body>
+</html>

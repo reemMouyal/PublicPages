@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ספארי מילים 2 • אנגלית לכיתה ה׳</title>
+<style>
+:root{color-scheme:light;--ink:#182c2a;--muted:#49605a;--line:#dbe7dc;--green:#135b49;--paper:#fffefa}
+*{box-sizing:border-box}body{margin:0;background:#f5f4e9;color:var(--ink);font-family:system-ui,Arial,sans-serif}button,input,select{font:inherit}button,select{cursor:pointer}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #b7550b;outline-offset:3px}main{max-width:880px;margin:auto;padding:24px 16px 48px}.hero{position:relative;overflow:hidden;background:#123e36;color:#fff9e8;padding:26px clamp(18px,5vw,42px);border-radius:25px;min-height:168px}.hero svg{position:absolute;left:0;bottom:0;width:min(38%,285px);height:auto;opacity:.83;pointer-events:none}.hero div{position:relative;max-width:74%}.tag{font-size:.8rem;color:#fbdb86;font-weight:750;letter-spacing:.04em}h1{font-size:clamp(2rem,7vw,3.5rem);margin:4px 0;line-height:1.1}.hero p{margin:10px 0 0;color:#ebf5e4}.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:18px 0 12px}.modes{display:flex;flex-wrap:wrap;gap:6px}.modes button,select,.secondary{border:1px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink);padding:9px 12px;min-height:44px}.modes button[aria-pressed=true],.primary{background:var(--green);color:white;border-color:var(--green)}.primary{border:1px solid var(--green);border-radius:12px;padding:10px 19px;font-weight:750;min-height:44px}.toolbar label{margin-inline-start:auto;color:var(--muted);font-size:.9rem}.panel{border:1px solid var(--line);background:var(--paper);border-radius:22px;padding:clamp(15px,4vw,30px);box-shadow:0 10px 30px #203c2410}.meta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:.93rem}.track{height:7px;background:#e6eee4;border-radius:9px;margin:10px 0;overflow:hidden}.track span{display:block;background:#258569;height:100%;border-radius:9px}.card{text-align:center;background:#edf5e9;border-radius:17px;padding:18px 10px;margin:16px 0}.card h2{margin:6px 0;font-size:clamp(1.75rem,6vw,2.9rem);overflow-wrap:anywhere}.card p{margin:6px 0;color:var(--muted)}.symbol{font-size:2.7rem;line-height:1.15}.actions{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:12px}.options{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.options button{border:1px solid #c8dbcf;border-radius:12px;background:#fff;color:var(--ink);min-height:49px;padding:8px;font-weight:700}.options button.good{background:#d9f3de;border-color:#258569}.options button.bad{background:#fde6e2;border-color:#af5549}.options button:disabled{opacity:1;cursor:default}.feedback{text-align:center;min-height:1.55em;font-weight:700;margin:12px 0;color:#285e48}.miss{color:#8a3027}.spelling{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}.spelling input{border:1px solid #9cb4a4;border-radius:12px;padding:10px;min-height:44px;width:min(100%,280px)}.scene{display:block;margin:4px auto;width:min(100%,265px);height:auto}.review{line-height:1.9}.hint{text-align:center;color:var(--muted);font-size:.9rem}.en{direction:ltr;unicode-bidi:isolate}button:not(:disabled):hover{filter:brightness(.95)}@media(max-width:510px){.toolbar label{margin-inline-start:0}.hero p{font-size:.9rem}}
+</style>
+</head>
+<body><main>
+<header class="hero">
+<svg viewBox="0 0 260 140" aria-hidden="true"><circle cx="92" cy="60" r="41" fill="#f5c965"/><path d="M0 123Q55 65 123 114Q195 62 260 108V140H0" fill="#479778"/><path d="M0 134Q84 101 150 126Q208 99 260 116V140H0" fill="#81b37e"/><path d="M53 137V63m0 41-17-16m17 28 20-17" stroke="#183c30" stroke-width="5" stroke-linecap="round"/><ellipse cx="51" cy="68" rx="32" ry="17" fill="#245c43"/><ellipse cx="28" cy="86" rx="23" ry="11" fill="#245c43"/><ellipse cx="76" cy="94" rx="21" ry="11" fill="#245c43"/></svg>
+<div><span class="tag">אנגלית לכיתה ה׳</span><h1>ספארי מילים 2</h1><p>128 מילים ב־8 נושאים. בחרי נושא והתחילי לתרגל.</p></div>
+</header>
+<div class="toolbar"><nav class="modes" aria-label="מצב תרגול"><button data-mode="cards">כרטיסיות</button><button data-mode="quiz">בחירה</button><button data-mode="listen">האזנה</button><button data-mode="spell">כתיב</button></nav><label for="category">נושא</label><select id="category"><option value="all">כל המילים (128)</option><option value="people">משפחה ואנשים (18)</option><option value="objects">בית ספר וחפצים (26)</option><option value="numbers">מספרים (19)</option><option value="food">אוכל ופירות (11)</option><option value="animals">בעלי חיים (16)</option><option value="verbs">פעלים (17)</option><option value="adjectives">תארים (14)</option><option value="places">מילות יחס (7)</option></select></div>
+<section id="panel" class="panel" aria-label="אזור תרגול"></section>
+<p id="audioStatus" class="hint" role="status"></p>
+</main>
+<script>
+const entries = [
+ ["baby","תינוק / תינוקת","👶","people",[]],
+ ["boy","ילד","👦","people",[]],
+ ["brother","אח","","people",[]],
+ ["doctor","רופא / רופאה","🩺","people",[]],
+ ["father","אבא","","people",[]],
+ ["friend","חבר / חברה","","people",[]],
+ ["girl","ילדה","👧","people",[]],
+ ["grandmother","סבתא","👵","people",[]],
+ ["grandfather","סבא","👴","people",[]],
+ ["man","גבר","","people",[]],
+ ["mother","אמא","","people",[]],
+ ["pupil","תלמיד / תלמידה","🎒","people",[]],
+ ["shopkeeper","בעל / בעלת חנות","🏪","people",[]],
+ ["sister","אחות","","people",[]],
+ ["teacher","מורה","🧑‍🏫","people",[]],
+ ["children","ילדים","","people",[]],
+ ["men","גברים","","people",[]],
+ ["women","נשים","","people",[]],
+ ["bag","תיק","🎒","objects",[]],
+ ["ball","כדור","⚽","objects",[]],
+ ["book","ספר","📚","objects",[]],
+ ["box","קופסה","📦","objects",[]],
+ ["eraser","מחק","","objects",[]],
+ ["pen","עט","🖊️","objects",[]],
+ ["pencil case","קלמר","","objects",[]],
+ ["ruler","סרגל","📏","objects",[]],
+ ["notebook","מחברת","📓","objects",[]],
+ ["pencil","עיפרון","✏️","objects",[]],
+ ["markers","טושים","","objects",[]],
+ ["bike","אופניים","🚲","objects",[]],
+ ["boots","מגפיים","🥾","objects",[]],
+ ["cake","עוגה","🍰","objects",[]],
+ ["chair","כיסא","🪑","objects",[]],
+ ["computer","מחשב","💻","objects",[]],
+ ["desk","שולחן כתיבה","","objects",[]],
+ ["hat","כובע","🎩","objects",[]],
+ ["house","בית","🏠","objects",[]],
+ ["plane","מטוס","✈️","objects",[]],
+ ["present","מתנה","🎁","objects",["gift"]],
+ ["school","בית ספר","🏫","objects",[]],
+ ["telephone","טלפון","☎️","objects",["phone"]],
+ ["bus","אוטובוס","🚌","objects",[]],
+ ["car","מכונית","🚗","objects",[]],
+ ["sandwich","כריך","🥪","objects",[]],
+ ["one","אחת","1","numbers",[]],
+ ["two","שתיים","2","numbers",[]],
+ ["three","שלוש","3","numbers",[]],
+ ["four","ארבע","4","numbers",[]],
+ ["five","חמש","5","numbers",[]],
+ ["six","שש","6","numbers",[]],
+ ["seven","שבע","7","numbers",[]],
+ ["eight","שמונה","8","numbers",[]],
+ ["nine","תשע","9","numbers",[]],
+ ["ten","עשר","10","numbers",[]],
+ ["eleven","אחת עשרה","11","numbers",[]],
+ ["twelve","שתים עשרה","12","numbers",[]],
+ ["thirteen","שלוש עשרה","13","numbers",[]],
+ ["fourteen","ארבע עשרה","14","numbers",[]],
+ ["fifteen","חמש עשרה","15","numbers",[]],
+ ["sixteen","שש עשרה","16","numbers",[]],
+ ["seventeen","שבע עשרה","17","numbers",[]],
+ ["eighteen","שמונה עשרה","18","numbers",[]],
+ ["nineteen","תשע עשרה","19","numbers",[]],
+ ["apple","תפוח","🍎","food",[]],
+ ["avocado","אבוקדו","🥑","food",[]],
+ ["banana","בננה","🍌","food",[]],
+ ["egg","ביצה","🥚","food",[]],
+ ["lemon","לימון","🍋","food",[]],
+ ["mango","מנגו","🥭","food",[]],
+ ["melon","מלון","🍈","food",[]],
+ ["orange","תפוז","🍊","food",[]],
+ ["food","אוכל","🍽️","food",[]],
+ ["milk","חלב","🥛","food",[]],
+ ["water","מים","💧","food",[]],
+ ["snake","נחש","🐍","animals",[]],
+ ["zebra","זברה","🦓","animals",[]],
+ ["rabbit","ארנב","🐰","animals",[]],
+ ["bird","ציפור","🐦","animals",[]],
+ ["cat","חתול","🐱","animals",[]],
+ ["dog","כלב","🐶","animals",[]],
+ ["dolphin","דולפין","🐬","animals",[]],
+ ["kangaroo","קנגורו","🦘","animals",[]],
+ ["lion","אריה","🦁","animals",[]],
+ ["penguin","פינגווין","🐧","animals",[]],
+ ["panda","פנדה","🐼","animals",[]],
+ ["animal","בעל חיים","🐾","animals",[]],
+ ["bear","דוב","🐻","animals",[]],
+ ["elephant","פיל","🐘","animals",[]],
+ ["giraffe","ג׳ירפה","🦒","animals",[]],
+ ["monkey","קוף","🐒","animals",[]],
+ ["dance","לרקוד","💃","verbs",["to dance"]],
+ ["jump","לקפוץ","","verbs",["to jump"]],
+ ["run","לרוץ","🏃","verbs",["to run"]],
+ ["sing","לשיר","🎤","verbs",["to sing"]],
+ ["talk","לדבר","💬","verbs",["to talk"]],
+ ["climb","לטפס","🧗","verbs",["to climb"]],
+ ["fly","לעוף","🪽","verbs",["to fly"]],
+ ["read","לקרוא","📖","verbs",["to read"]],
+ ["drink","לשתות","🥤","verbs",["to drink"]],
+ ["sleep","לישון","💤","verbs",["to sleep"]],
+ ["swim","לשחות","🏊","verbs",["to swim"]],
+ ["open","לפתוח","","verbs",["to open"]],
+ ["play","לשחק","🎲","verbs",["to play"]],
+ ["ride","לרכוב","🚴","verbs",["to ride"]],
+ ["say","לומר","","verbs",["to say"]],
+ ["sit","לשבת","","verbs",["to sit"]],
+ ["eat","לאכול","🍽️","verbs",["to eat"]],
+ ["angry","כועס","😠","adjectives",[]],
+ ["big","גדול","🔵","adjectives",[]],
+ ["clean","נקי","✨","adjectives",[]],
+ ["dirty","מלוכלך","","adjectives",[]],
+ ["fat","שמן","","adjectives",[]],
+ ["happy","שמח","😊","adjectives",[]],
+ ["hungry","רעב","🍽️","adjectives",[]],
+ ["sad","עצוב","😢","adjectives",[]],
+ ["scared","מפוחד","😨","adjectives",[]],
+ ["thin","רזה","","adjectives",[]],
+ ["tired","עייף","🥱","adjectives",[]],
+ ["tall","גבוה","","adjectives",[]],
+ ["short","נמוך (בגובה) / קצר","","adjectives",[]],
+ ["small","קטן","","adjectives",[]],
+ ["on","על","","places",[],"The ball is on the box."],
+ ["in","בתוך","","places",[],"The ball is in the box."],
+ ["under","מתחת ל־","","places",[],"The ball is under the box."],
+ ["next to","צמוד ל־ / ליד","","places",[],"The ball is next to the box."],
+ ["between","בין","","places",[],"The ball is between the boxes."],
+ ["near","קרוב ל־","","places",[],"The ball is near the box."],
+ ["behind","מאחורי","","places",[],"The ball is behind the box."]
+].map(([en,he,icon,group,also=[],example])=>({en,he,icon,group,also,example}));
+const panel=document.querySelector('#panel'), category=document.querySelector('#category'), audioStatus=document.querySelector('#audioStatus');
+let mode='cards', deck=[], index=0, correct=0, errors=[], revealed=false, answered=false;
+function shuffle(items){
+ const result=[...items];
+ for(let i=result.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}
+ return result;
+}
+function start(review){
+ if('speechSynthesis' in window) window.speechSynthesis.cancel();
+ audioStatus.textContent='';
+ const words=entries.filter(word=>category.value==='all'||word.group===category.value);
+ deck=review || (mode==='cards'?words:shuffle(words).slice(0,10));
+ index=0;correct=0;errors=[];revealed=false;answered=false;
+ document.querySelectorAll('[data-mode]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mode===mode)));
+ render();
+}
+function speak(value){
+ audioStatus.textContent='';
+ if(!('speechSynthesis' in window)){audioStatus.textContent='הקראה אינה זמינה בדפדפן הזה.';return;}
+ const speech=window.speechSynthesis;
+ const utterance=new SpeechSynthesisUtterance(value);
+ const voices=speech.getVoices();
+ const voice=voices.find(v=>v.lang==='en-US'&&v.localService)||voices.find(v=>/^en[-_]/i.test(v.lang)&&v.localService)||voices.find(v=>/^en[-_]/i.test(v.lang));
+ if(voice) utterance.voice=voice;
+ utterance.lang=voice?.lang||'en-US';utterance.rate=.83;
+ utterance.onerror=event=>{if(!['canceled','interrupted'].includes(event.error))audioStatus.textContent='ההקראה לא פעלה. כדאי לבדוק שבמכשיר מותקן קול באנגלית.';};
+ speech.cancel();speech.speak(utterance);
+}
+function scene(word){
+ const positions={on:[112,33],in:[112,70],under:[112,107],'next to':[150,84],near:[170,84],between:[152,79],behind:[130,46]};
+ const [x,y]=positions[word.en];
+ const box=left=>'<rect x="'+left+'" y="45" width="48" height="48" rx="5" fill="#f7d18d" stroke="#885b2e" stroke-width="3"/>';
+ const ball='<circle cx="'+x+'" cy="'+y+'" r="11" fill="#db5c46" stroke="#8e392b" stroke-width="2"/>';
+ const objects=word.en==='behind'?ball+box(88):box(88)+ball+(word.en==='between'?box(171):'');
+ return '<svg class="scene" viewBox="0 0 255 125" aria-hidden="true">'+objects+'</svg>';
+}
+function english(value){return '<bdi lang="en" class="en">'+value+'</bdi>';}
+function render(){
+ if(index===deck.length){finish();return;}
+ const word=deck[index];
+ const heading=mode==='cards'?english(word.en):mode==='listen'?'מה שמעת?':word.he;
+ const visual=mode==='listen'?'':word.group==='places'?scene(word):word.icon?'<div class="symbol" aria-hidden="true">'+word.icon+'</div>':'';
+ panel.innerHTML='<div class="meta"><span>'+(mode==='cards'?'כרטיס':'שאלה')+' '+(index+1)+' מתוך '+deck.length+'</span><span>'+(mode==='cards'?'':'⭐ '+correct+' נכונות')+'</span></div>'
+ +'<div class="track" aria-hidden="true"><span style="width:'+((index+1)/deck.length*100)+'%"></span></div>'
+ +'<div class="card">'+visual+'<h2>'+heading+'</h2>'
+ +(mode==='cards'?(revealed?'<p>'+word.he+'</p>'+(word.example?'<p>'+english(word.example)+'</p>':''):'<p>נסי להיזכר בתרגום לפני שאת מגלה אותו.</p>'):mode==='spell'?'<p>כתבי באנגלית.</p>':mode==='quiz'?'<p>בחרי את התרגום באנגלית.</p>':'<p>לחצי על הכפתור ובחרי את הפירוש בעברית.</p>')
+ +((mode==='listen'||mode==='cards')?'<div class="actions"><button class="secondary" id="speak">🔊 השמעה</button>'+(mode==='cards'&&revealed&&word.example?'<button class="secondary" id="example">🔊 השמעת משפט</button>':'')+'</div>':'')+'</div>'
+ +'<div id="exercise"></div><p class="feedback" id="feedback" role="status"></p>';
+ const audio=panel.querySelector('#speak');if(audio)audio.onclick=()=>speak(word.en);
+ const example=panel.querySelector('#example');if(example)example.onclick=()=>speak(word.example);
+ const exercise=panel.querySelector('#exercise');
+ if(mode==='cards'){
+  exercise.innerHTML='<div class="actions"><button class="secondary" id="previous" '+(index===0?'disabled':'')+'>הקודם</button><button class="secondary" id="reveal">'+(revealed?'הסתרת תרגום':'גילוי תרגום')+'</button><button class="primary" id="next">הבא</button></div>';
+  exercise.querySelector('#previous').onclick=()=>advance(-1);
+  exercise.querySelector('#reveal').onclick=()=>{revealed=!revealed;render();panel.querySelector('#reveal').focus();};
+  exercise.querySelector('#next').onclick=()=>advance();
+ }else if(mode==='spell'){
+  exercise.innerHTML='<form class="spelling"><input dir="ltr" lang="en" aria-label="תשובה באנגלית" autocomplete="off" autocapitalize="none" spellcheck="false" required placeholder="Type in English"><button class="primary">בדיקה</button></form>';
+  const form=exercise.querySelector('form'), input=form.querySelector('input');
+  form.onsubmit=event=>{event.preventDefault();const value=input.value.trim().toLowerCase().replace(/\s+/g,' ');if(!value){input.focus();return;}answer([word.en,...word.also].includes(value));};
+ }else{
+  const distractors=shuffle(entries.filter(item=>item.group===word.group&&item!==word)).slice(0,3);
+  const options=document.createElement('div');options.className='options';exercise.append(options);
+  for(const item of shuffle([word,...distractors])){
+   const button=document.createElement('button');button.type='button';
+   if(mode==='quiz')button.innerHTML=english(item.en);else button.textContent=item.he;
+   if(item===word)button.dataset.correct='true';
+   button.onclick=()=>{if(item!==word)button.classList.add('bad');answer(item===word);};
+   options.append(button);
+  }
+ }
+}
+function answer(ok){
+ if(answered)return;
+ answered=true;
+ const word=deck[index];
+ if(ok)correct++;else errors.push(word);
+ panel.querySelectorAll('#exercise button,#exercise input').forEach(control=>{control.disabled=true;if(control.dataset.correct)control.classList.add('good');});
+ const feedback=panel.querySelector('#feedback');
+ feedback.classList.toggle('miss',!ok);
+ feedback.innerHTML=(ok?'✓ מעולה! ':'הפעם התשובה היא ')+english(word.en)+' · '+word.he;
+ const actions=document.createElement('div');actions.className='actions';
+ actions.innerHTML='<button class="secondary" id="hearAnswer">🔊 שמיעת התשובה</button><button class="primary" id="continue">המשך</button>';
+ panel.append(actions);
+ actions.querySelector('#hearAnswer').onclick=()=>speak(word.en);
+ actions.querySelector('#continue').onclick=()=>advance();
+}
+function advance(step=1){
+ index+=step;revealed=false;answered=false;audioStatus.textContent='';render();
+ panel.querySelector('h2')?.setAttribute('tabindex','-1');
+ panel.querySelector('h2')?.focus();
+}
+function finish(){
+ const review=errors.slice();
+ panel.innerHTML='<div class="card"><div class="symbol" aria-hidden="true">🏅</div><h2>כל הכבוד!</h2><p>'+(mode==='cards'?'סיימת לעבור על '+deck.length+' כרטיסיות.':correct+' מתוך '+deck.length+' תשובות נכונות.')+'</p></div>'
+ +(review.length?'<ul class="review">'+review.map(word=>'<li>'+english(word.en)+' · '+word.he+'</li>').join('')+'</ul>':'')
+ +'<div class="actions"><button class="primary" id="restart">סיבוב חדש</button>'+(review.length?'<button class="secondary" id="review">תרגול המילים שפספסתי</button>':'')+'</div>';
+ panel.querySelector('#restart').onclick=()=>start();
+ const retry=panel.querySelector('#review');if(retry)retry.onclick=()=>start(shuffle(review));
+}
+document.querySelectorAll('[data-mode]').forEach(button=>button.onclick=()=>{mode=button.dataset.mode;start();});
+category.onchange=()=>start();
+start();
+</script>
+</body></html>
