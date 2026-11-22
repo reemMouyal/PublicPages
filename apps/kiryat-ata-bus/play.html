@@ -472,7 +472,63 @@
       };
 
       const returning = new URLSearchParams(location.search).get("direction") === "return";
-      const routes = returning ? {"80":3932, "80א":3934} : {"80":3935, "80א":3936};
+      const morningRoutes = {"80":3935, "80א":3936};
+      // Verified GTFS routes from אריה לוין /חבד toward קריית אתא.
+      const returnRoutes = [
+        { id: 3932, line: "80", stops: [
+          ["42937", "אריה לוין /חבד", 32.841402, 35.071687],
+          ["47360", "ת. רכבת קרית מוצקין", 32.833387, 35.069672],
+          ["47659", "ריינס/נתיב שד''ר", 32.83167, 35.065872],
+          ["42762", "אח''י אילת/הגדוד העיברי", 32.822696, 35.067046],
+          ["42766", "בן צבי/השיירה", 32.817745, 35.06966],
+          ["43070", "הדשנים", 32.809782, 35.070798],
+          ["43055", "דרך חיפה", 32.805684, 35.074309],
+          ["40518", "דרך חיפה/זבולון", 32.803703, 35.075304],
+          ["43049", "זבולון/דרך חיפה", 32.802061, 35.077612],
+          ["40520", "זבולון/קק''ל", 32.802761, 35.08343],
+          ["43047", "זבולון/קרית שטנד", 32.802917, 35.086555],
+          ["43051", "זבולון/משה שרת", 32.803593, 35.091442],
+          ["43050", "זבולון/שיבת ציון", 32.803975, 35.094417],
+          ["43052", "זבולון/לילנבלום", 32.80427, 35.097032],
+          ["43059", "קרית אתא מרכז", 32.805236, 35.102941],
+          ["42414", "הציונות/המייסדים", 32.806136, 35.106136],
+          ["41599", "רמז/ארלוזורוב", 32.805504, 35.109614],
+          ["42854", "רמז/בית רבין", 32.806817, 35.110618],
+          ["41601", "רמז/הציונות", 32.805787, 35.109703],
+          ["41746", "כצנלסון/ירושלים", 32.80293, 35.107315],
+          ["42357", "כצנלסון/הנביאים", 32.800892, 35.105673],
+          ["42014", "העצמאות/בית וגן", 32.79879, 35.102497],
+          ["41345", "כנרת/הדקלים", 32.796548, 35.101314]
+        ] },
+        { id: 3934, line: "80א", stops: [
+          ["42937", "אריה לוין /חבד", 32.841402, 35.071687],
+          ["41632", "דרך עכו/צומת עין אפק", 32.849634, 35.093082],
+          ["40377", "י.ל. פרץ/פרישמן", 32.814089, 35.102692],
+          ["43060", "קופת חולים/העצמאות", 32.81137, 35.104583],
+          ["42715", "המגינים/פינסקר", 32.808899, 35.106349],
+          ["42097", "חנקין/רופין", 32.812117, 35.108071],
+          ["41350", "הרצל/חנקין", 32.811648, 35.110927],
+          ["41356", "איינשטיין/הצנחנים", 32.812757, 35.11279],
+          ["41602", "איינשטיין/אסף שמחוני", 32.813598, 35.115717],
+          ["41825", "בן יוסף/צפניה", 32.816147, 35.116356],
+          ["41368", "עשת/שמואל עזר", 32.814804, 35.118914],
+          ["41362", "שמואל עזר", 32.812894, 35.120563],
+          ["41363", "שמואל עזר/טביב", 32.8118, 35.121192],
+          ["42841", "טביב/מרזוק", 32.809888, 35.119771],
+          ["41367", "טביב/אסף שמחוני", 32.808979, 35.118164],
+          ["41360", "זבוטינסקי", 32.808138, 35.119484],
+          ["41361", "זבוטינסקי/הפלמח", 32.808309, 35.121958],
+          ["41372", "אנילביץ/יצחק שדה", 32.808479, 35.123888],
+          ["41374", "בן עמי/מימון", 32.810094, 35.12524],
+          ["41868", "בן עמי/אריה רגב", 32.810977, 35.126593],
+          ["41375", "בן עמי", 32.810096, 35.12834]
+        ] }
+      ].map(route => ({...route, stops: route.stops.map(([code, name, lat, lng]) => ({code, name, lat, lng}))}));
+      const returnVehicles = new Map();
+      const notifiedReturnTrips = new Set();
+      let returnRouteCursor = 0;
+      let returnStopSelection = "";
+      const alertStorageKey = returning ? "bus80_return_alert_stops" : "bus80_multi_alert_stops";
       const STRIDE_BASE = "https://open-bus-stride-api.hasadna.org.il";
 
       const state = {
@@ -491,7 +547,7 @@
         refreshTimer: null,
         liveStatusMessage: "ממתין לעדכון מפריבוס כשהמפה גלויה…",
         isFetching: false,
-        alertStops: new Set(["80:42356", "80:43058", "80א:43060", "80א:40377"]),
+        alertStops: new Set(returning ? [] : ["80:42356", "80:43058", "80א:43060", "80א:40377"]),
         firedAlertStops: new Set(),
         alertSound: true,
         pushPermission: typeof Notification !== "undefined" ? Notification.permission : "unsupported",
@@ -502,7 +558,7 @@
       };
 
       try {
-        const saved = localStorage.getItem("bus80_multi_alert_stops");
+        const saved = localStorage.getItem(alertStorageKey);
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed)) {
@@ -513,7 +569,7 @@
 
       function saveAlertStops() {
         try {
-          localStorage.setItem("bus80_multi_alert_stops", JSON.stringify([...state.alertStops]));
+          localStorage.setItem(alertStorageKey, JSON.stringify([...state.alertStops]));
         } catch (e) {}
       }
 
@@ -588,6 +644,7 @@
       const historyLayers = { "80": L.layerGroup(), "80א": L.layerGroup() };
       const stopMarkers = { "80": [], "80א": [] };
       const returnLayer = L.layerGroup();
+      const returnStopLayer = L.layerGroup();
       const busMarkers = { "80": null, "80א": null };
 
       function getActiveLineIds() {
@@ -788,12 +845,16 @@
           ? `כך תיראה התראת הפוש כש${LINES[lineId].label} יגיע לתחנה ${stop.idx + 1} (${stop.code}).`
           : `תחנה ${stop.idx + 1} מתוך ${total} • ${stop.address} (מק"ט ${stop.code})`;
 
+        notifyStop(title, body, stop, `bus-${lineId}-${stop.code}`);
+      }
+
+      function notifyStop(title, body, stop, tag) {
         playAlertChime();
         showPushToast(title, body, stop);
 
         if (typeof Notification !== "undefined" && Notification.permission === "granted") {
           try {
-            new Notification(title, { body, tag: `bus-${lineId}-${stop.code}` });
+            new Notification(title, { body, tag });
           } catch (e) {}
         }
       }
@@ -812,6 +873,13 @@
       }
 
       function updatePushUi() {
+        if (returning) {
+          for (const bell of stopsList.querySelectorAll("[data-return-alert]")) {
+            const selected = state.alertStops.has(bell.dataset.returnAlert);
+            bell.setAttribute("aria-pressed", String(selected));
+            bell.textContent = selected ? "🔔" : "🔕";
+          }
+        }
         const count = state.alertStops.size;
         alertCountBadge.textContent = count === 1 ? "תחנה 1 נבחרה" : `${count} נבחרו`;
         if (count > 0) btnClearAlerts.classList.remove("hidden");
@@ -1030,7 +1098,11 @@
       }
 
       function fitVisibleRoutes() {
-        if (returning) { map.fitBounds([[32.787,35.055],[32.851,35.124]]); return; }
+        if (returning) {
+          const points = activeReturnRoutes().flatMap(route => route.stops.map(stop => [stop.lat, stop.lng]));
+          map.fitBounds(L.latLngBounds(points).pad(0.14));
+          return;
+        }
         const coords = [];
         getActiveLineIds().forEach((id) => {
           LINES[id].stops.forEach((s) => {
@@ -1054,6 +1126,97 @@
         decisionCard.className = `rounded-2xl border-2 bg-white shadow-sm overflow-hidden transition-colors ${t.card}`;
         decisionHeader.className = `px-4 py-3 border-b flex flex-wrap items-center justify-between gap-2 ${t.header}`;
         zoneBadge.className = `px-2.5 py-1 rounded-full text-xs font-extrabold ${t.badge}`;
+      }
+
+      function activeReturnRoutes() {
+        return returnRoutes.filter(route => getActiveLineIds().includes(route.line));
+      }
+
+      function renderReturn() {
+        const routes = activeReturnRoutes();
+        const selection = routes.map(route => route.id).join(",");
+        if (selection !== returnStopSelection) {
+          returnStopSelection = selection;
+          renderReturnStops(routes);
+        }
+        updatePushUi();
+        returnLayer.clearLayers();
+        const reports = [];
+        for (const route of routes) {
+          const destination = route.stops.at(-1).name;
+          for (const vehicle of returnVehicles.get(route.id) || []) {
+            if (!fresh(vehicle.recordedAt)) continue;
+            const description = `קו ${route.line} לכיוון ${destination} · ${formatAge(vehicle.recordedAt)}`;
+            const label = document.createElement("span");
+            label.textContent = description;
+            L.marker([vehicle.lat, vehicle.lon], {icon:buildBusIcon(route.line)})
+              .bindTooltip(label).addTo(returnLayer);
+            reports.push(description);
+          }
+        }
+        freshnessText.textContent = reports.join(" • ") || state.liveStatusMessage;
+        zoneBadge.textContent = "חזור לקריית אתא";
+      }
+
+      function renderReturnStops(routes) {
+        returnStopLayer.clearLayers();
+        stopsList.replaceChildren();
+        stopsRemainingBadge.textContent = `${routes.reduce((count, route) => count + route.stops.length, 0)} תחנות`;
+        for (const route of routes) {
+          const section = document.createElement("div");
+          const heading = document.createElement("h3");
+          heading.className = "px-2 py-2 text-sm font-bold text-slate-800";
+          heading.textContent = `קו ${route.line} לכיוון ${route.stops.at(-1).name}`;
+          section.append(heading);
+          route.stops.forEach((stop, index) => {
+            const point = [stop.lat, stop.lng];
+            const key = `${route.id}:${stop.code}`;
+            const row = document.createElement("div");
+            row.className = "flex items-center justify-between gap-2 px-2 py-2 border-t border-slate-100";
+            const name = document.createElement("button");
+            name.type = "button";
+            name.className = "text-right text-sm hover:underline";
+            name.textContent = `${index + 1}. ${stop.name} · ${stop.code}`;
+            const label = document.createElement("span");
+            label.textContent = `קו ${route.line} · ${stop.name}`;
+            const marker = L.circleMarker(point, {radius:5, color:LINES[route.line].color, fillOpacity:0.85})
+              .bindTooltip(label).addTo(returnStopLayer);
+            name.addEventListener("click", () => {
+              map.flyTo(point, 16);
+              marker.openTooltip();
+            });
+            const bell = document.createElement("button");
+            bell.type = "button";
+            bell.className = "rounded-lg border border-amber-300 px-2 py-1";
+            bell.setAttribute("aria-label", `התראה לקו ${route.line} בתחנת ${stop.name}`);
+            bell.dataset.returnAlert = key;
+            bell.addEventListener("click", () => {
+              if (state.alertStops.has(key)) state.alertStops.delete(key);
+              else state.alertStops.add(key);
+              saveAlertStops();
+              updatePushUi();
+            });
+            row.append(name, bell);
+            section.append(row);
+          });
+          stopsList.append(section);
+        }
+      }
+
+      function checkReturnAlerts(route, vehicles) {
+        if (!mapIsVisible() || !getActiveLineIds().includes(route.line)) return;
+        for (const vehicle of vehicles) {
+          if (!vehicle.tripId || !fresh(vehicle.recordedAt)) continue;
+          for (const stop of route.stops) {
+            const key = `${route.id}:${stop.code}`;
+            const tripKey = `${key}:${vehicle.tripId}`;
+            if (!state.alertStops.has(key) || notifiedReturnTrips.has(tripKey)) continue;
+            if (haversineMeters(vehicle.lat, vehicle.lon, stop.lat, stop.lng) > 100) continue;
+            notifiedReturnTrips.add(tripKey);
+            notifyStop(`קו ${route.line} דווח ליד ${stop.name}`,
+              `לכיוון ${route.stops.at(-1).name} · ${formatAge(vehicle.recordedAt)}`, stop, tripKey);
+          }
+        }
       }
 
       function render() {
@@ -1097,16 +1260,7 @@
         }
 
         if (returning) {
-          returnLayer.clearLayers();
-          const notes = activeIds.map(id => {
-            const vehicles = (state.liveData[id].vehicles || []).filter(v => fresh(v.recordedAt));
-            for (const v of vehicles) {
-              L.marker([v.lat,v.lon], {icon:buildBusIcon(id)}).bindTooltip("קו " + id + " · " + formatAge(v.recordedAt)).addTo(returnLayer);
-            }
-            return "קו " + id + ": " + (vehicles.length ? vehicles.map(v=>formatAge(v.recordedAt)).join(", ") : "אין דיווח עדכני");
-          });
-          freshnessText.textContent = notes.join(" • ");
-          zoneBadge.textContent = "חזור לקריית אתא";
+          renderReturn();
           return;
         }
         const rec = computeOverallRecommendation();
@@ -1412,15 +1566,25 @@
           && rect.right > 0 && rect.left < innerWidth;
       }
 
-      async function updateLine(id) {
-        const url = "https://api.freebus.co.il/routes/" + routes[id] + "/vehicles";
+      async function loadRouteVehicles(routeId) {
+        const url = "https://api.freebus.co.il/routes/" + routeId + "/vehicles";
         const res = await fetch(url, {cache:"no-store",signal:AbortSignal.timeout(15000)});
         if (!res.ok) throw Error("FreeBus " + res.status);
         const data = await res.json();
-        const vehicles = data.vehicles.filter(v => Number.isFinite(v.lat) && Number.isFinite(v.lon) && fresh(v.recordedAt))
+        return data.vehicles.filter(v => Number.isFinite(v.lat) && Number.isFinite(v.lon) && fresh(v.recordedAt))
           .sort((a,b) => Date.parse(b.recordedAt) - Date.parse(a.recordedAt));
+      }
+
+      async function updateReturnRoute(route) {
+        const vehicles = await loadRouteVehicles(route.id);
+        returnVehicles.set(route.id, vehicles);
+        checkReturnAlerts(route, vehicles);
+      }
+
+      async function updateLine(id) {
+        const vehicles = await loadRouteVehicles(morningRoutes[id]);
         const v = vehicles[0];
-        const nearest = v && !returning ? findNearestStop(id,v.lat,v.lon) : null;
+        const nearest = v ? findNearestStop(id,v.lat,v.lon) : null;
         state.liveData[id] = {vehicles, recordedAt:v?.recordedAt || null,
           latLng:v ? [v.lat,v.lon] : null, busIndex:nearest?.idx ?? null, distMeters:nearest?.distMeters ?? null};
       }
@@ -1436,7 +1600,17 @@
             const now = Date.now();
             if (now - Number(localStorage.getItem(budgetKey)) < 61000) return;
             localStorage.setItem(budgetKey,String(now));
-            const results = await Promise.allSettled(getActiveLineIds().map(updateLine));
+            let requests;
+            if (returning) {
+              const active = activeReturnRoutes();
+              const rotated = active.slice(returnRouteCursor).concat(active.slice(0, returnRouteCursor));
+              const batch = rotated.slice(0, 2);
+              returnRouteCursor = (returnRouteCursor + batch.length) % active.length;
+              requests = batch.map(updateReturnRoute);
+            } else {
+              requests = getActiveLineIds().map(updateLine);
+            }
+            const results = await Promise.allSettled(requests);
             const failed = results.some(r => r.status === "rejected");
             state.liveStatusMessage = failed ? "עדכון המיקום מפריבוס נכשל." : "אין דיווח עדכני בכיוון שנבחר.";
             apiMetaFooter.textContent = failed ? state.liveStatusMessage : "בדיקה אחרונה: " + new Date().toLocaleTimeString("he-IL");
@@ -1665,7 +1839,8 @@
           state.pushPermission = perm;
           updatePushUi();
           if (perm === "granted") {
-            triggerStopPush("80", LINES["80"].stops[0], true);
+            if (returning) btnTestPush.click();
+            else triggerStopPush("80", LINES["80"].stops[0], true);
           } else {
             showPushToast("התראת מסך פעילה", "לא ניתנה הרשאת פוש מערכת — תקבל התראת מסך וצליל בתוך האפליקציה.", null);
           }
@@ -1675,6 +1850,14 @@
       });
 
       btnTestPush.addEventListener("click", () => {
+        if (returning) {
+          const stops = activeReturnRoutes().flatMap(route => route.stops.map(stop => ({
+            route, stop, key:`${route.id}:${stop.code}`
+          })));
+          const {route, stop, key} = stops.find(item => state.alertStops.has(item.key)) || stops[0];
+          notifyStop(`בדיקת התראה · קו ${route.line}`, stop.name, stop, key);
+          return;
+        }
         const firstKey = state.alertStops.size > 0 ? [...state.alertStops][0] : `${getActiveLineIds()[0]}:${LINES[getActiveLineIds()[0]].stops[0].code}`;
         const [lid, code] = firstKey.split(":");
         const stop = (LINES[lid] && LINES[lid].stops.find((s) => s.code === code)) || LINES["80"].stops[0];
@@ -1700,9 +1883,13 @@
         document.querySelector("header h1 + p").textContent = "חזור בצהריים · מקריית שמואל לקריית אתא";
         const mapCard = mapElement.closest("section");
         mapCard.querySelector("h2").textContent = "מפת החזרה לקריית אתא";
-        mapCard.style.gridColumn = "1 / -1";
+        stopsListHeading.textContent = "תחנות החזור";
+        const alertInstructions = toggleAlertSound.closest("label").previousElementSibling;
+        alertInstructions.textContent = "סמנו פעמון בתחנה הרצויה. ההתראות פועלות כשהמפה פתוחה וגלויה.";
+        alertCountBadge.previousElementSibling.textContent = "התראות על דיווח מיקום ליד תחנה";
         for (const el of [welcomeBanner,btnModeSim,btnQuickSim,document.getElementById("decisionHeader").nextElementSibling,
-             document.getElementById("mapGeometryBar"),stopsList.closest("section"),btnToggleHistory,liveNoticeBar,mapCard.lastElementChild]) el.style.display = "none";
+             document.getElementById("mapGeometryBar"),btnToggleHistory,liveNoticeBar,mapCard.lastElementChild]) el.style.display = "none";
+        returnStopLayer.addTo(map);
         returnLayer.addTo(map);
       }
       new IntersectionObserver(() => {
