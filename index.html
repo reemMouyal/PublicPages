@@ -26,10 +26,16 @@
   <main>
     <h1>אפליקציות לימוד</h1>
     {% assign apps = site.html_pages | where: "app_catalog", true | sort: "title" %}
-    {% if apps.size == 0 %}
+    {% if false %}
       <p class="empty">אפליקציות הלימוד יופיעו כאן אחרי שיועלו.</p>
     {% else %}
       <ul>
+        <li class="card">
+          <div class="details">
+            <h2><a href="{{ '/tahal-english/' | relative_url }}">מילים באנגלית – תהל</a></h2>
+            <p>תרגול 16 מילים וביטויים באנגלית: כרטיסיות, בחירה, האזנה וכתיב.</p>
+          </div>
+        </li>
         {% for app in apps %}
           <li class="card">
             {% if app.thumbnail %}
