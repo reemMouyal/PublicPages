@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מטרונית 2 בזמן אמת</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{font-family:Arial,sans-serif;color:#232340;background:#f4f3fa}
+*{box-sizing:border-box}
+body{margin:0}
+main{max-width:1000px;margin:auto;padding:20px}
+header{display:flex;align-items:center;gap:14px}
+header span{background:#57308f;color:white;font-weight:bold;border-radius:14px;padding:10px 18px;font-size:28px}
+h1{margin:0;font-size:clamp(24px,5vw,36px)}
+p{margin:8px 0;line-height:1.45}
+#map{height:clamp(290px,57vh,620px);border-radius:15px;margin:18px 0;z-index:0}
+.status{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+button{font:inherit;background:#57308f;color:white;border:0;border-radius:9px;padding:10px 16px;cursor:pointer}
+button:disabled{opacity:.55;cursor:default}
+section{background:#fff;border-radius:15px;padding:16px;margin:14px 0}
+h2{font-size:19px;margin:0 0 10px}
+ul{padding-inline-start:22px;margin:0}
+li{margin:8px 0}
+footer{line-height:1.5;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+<header><span>2</span><div><h1>מטרונית בזמן אמת</h1><p>קריית אתא ↔ בת גלים · דף ניסוי</p></div></header>
+<div class="status"><p id="status" role="status">ממתין לדיווח מפריבוס…</p><button id="refresh" type="button">בדיקה עכשיו</button></div>
+<div id="map" dir="ltr" aria-label="מפת מיקום כלי הרכב"></div>
+<section><h2>דיווחי מיקום</h2><ul id="vehicles"></ul></section>
+<section><h2>יומן בדיקה</h2><ul id="history"><li>היומן מתעד תנועה כשמגיעים שני דיווחים עוקבים מאותו רכב.</li></ul></section>
+<footer>מקור המיקומים <a href="https://freebus.co.il/">פריבוס</a>. דיווחי זמן אמת עשויים להתעדכן באיחור. הרענון פועל בערך פעם בדקה כשהמפה גלויה.</footer>
+</main>
+<script>
+"use strict";
+const mapElement = document.querySelector("#map");
+const status = document.querySelector("#status");
+const refreshButton = document.querySelector("#refresh");
+const vehiclesElement = document.querySelector("#vehicles");
+const historyElement = document.querySelector("#history");
+const routes = [
+  { id: 11693, destination: "קריית אתא", color: "#216f74" },
+  { id: 11695, destination: "בת גלים", color: "#713ba2" }
+];
+const budgetKey = "kiryat-ata-freebus-last-batch-v1";
+const interval = 61000;
+const clock = new Intl.DateTimeFormat("he-IL", {timeStyle:"medium", timeZone:"Asia/Jerusalem"});
+const map = window.L?.map(mapElement).setView([32.815,35.035],12);
+const layer = map && L.layerGroup().addTo(map);
+if (map) L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom:19, attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+else mapElement.textContent = "טעינת המפה נכשלה. דיווחי המיקום יופיעו ברשימה למטה.";
+let latest = [];
+let markers = [];
+let pending = false;
+let lastCheck = 0;
+
+function visible() {
+  const rect = mapElement.getBoundingClientRect();
+  return document.visibilityState === "visible" && rect.height > 0 &&
+    rect.bottom > 0 && rect.top < innerHeight && rect.right > 0 && rect.left < innerWidth;
+}
+
+function render() {
+  vehiclesElement.replaceChildren();
+  latest.forEach((vehicle, index) => {
+    const seconds = Math.floor((Date.now() - vehicle.time) / 1000);
+    const fresh = seconds >= 0 && seconds <= 180;
+    const label = `לכיוון ${vehicle.destination} · רכב ${vehicle.vehicleRef ?? "ללא מזהה"} · מדידה ${clock.format(vehicle.time)} · ${seconds < 0 ? "שעת מדידה עתידית" : `לפני ${seconds} שנ׳`}${fresh ? "" : " · מיקום לא עדכני"}`;
+    const row = document.createElement("li");
+    row.textContent = label;
+    vehiclesElement.append(row);
+    const marker = markers[index];
+    if (marker && fresh) {
+      if (!layer.hasLayer(marker)) layer.addLayer(marker);
+      marker.getTooltip().setContent(Object.assign(document.createElement("span"), {textContent:label}));
+    } else if (marker) layer.removeLayer(marker);
+  });
+  if (!latest.length) {
+    const row = document.createElement("li");
+    row.textContent = "אין דיווחי מיקום להצגה.";
+    vehiclesElement.append(row);
+  }
+}
+
+async function fetchRoute(route) {
+  const response = await fetch(`https://api.freebus.co.il/routes/${route.id}/vehicles`, {
+    cache:"no-store", signal:AbortSignal.timeout(15000)
+  });
+  if (!response.ok) throw Error(`HTTP ${response.status}`);
+  const {vehicles} = await response.json();
+  return vehicles.map(vehicle => ({...route, ...vehicle, time:Date.parse(vehicle.recordedAt)}))
+    .filter(vehicle => Number.isFinite(vehicle.lat) && Number.isFinite(vehicle.lon) && Number.isFinite(vehicle.time));
+}
+
+function recordCheck(results) {
+  const next = results.flatMap(result => result.status === "fulfilled" ? result.value : []);
+  const failed = results.filter(result => result.status === "rejected").length;
+  const movements = next.flatMap(vehicle => {
+    const previous = latest.find(item => item.tripId === vehicle.tripId && item.vehicleRef === vehicle.vehicleRef);
+    if (!previous || !vehicle.vehicleRef || !vehicle.tripId || vehicle.time <= previous.time ||
+      (previous.lat === vehicle.lat && previous.lon === vehicle.lon)) return [];
+    const distance = Math.round(map ? map.distance([previous.lat,previous.lon],[vehicle.lat,vehicle.lon]) : 0);
+    return [`רכב ${vehicle.vehicleRef} התקדם${distance ? ` כ־${distance} מ׳` : ""} בין ${clock.format(previous.time)} ל־${clock.format(vehicle.time)}`];
+  });
+  latest = next;
+  layer?.clearLayers();
+  markers = map ? next.map(v => L.circleMarker([v.lat,v.lon], {
+    color:v.color, fillOpacity:.9, radius:9
+  }).bindTooltip("")) : [];
+  const count = next.filter(v => Date.now() >= v.time && Date.now() - v.time <= 180000).length;
+  const message = `${clock.format(lastCheck)} · ${count} דיווחים עדכניים${failed ? ` · ${failed} בקשות נכשלו` : ""}`;
+  status.textContent = message;
+  const row = document.createElement("li");
+  row.textContent = [message, ...movements].join(" · ");
+  historyElement.prepend(row);
+  while (historyElement.children.length > 8) historyElement.lastElementChild.remove();
+  render();
+}
+
+async function check() {
+  if (pending || !visible() || Date.now() - lastCheck < interval) return;
+  pending = true;
+  refreshButton.disabled = true;
+  try {
+    await navigator.locks.request(budgetKey, {ifAvailable:true}, async lock => {
+      if (!lock || !visible()) return;
+      const now = Date.now();
+      if (now - Number(localStorage.getItem(budgetKey)) < interval) return;
+      localStorage.setItem(budgetKey, String(now));
+      lastCheck = now;
+      status.textContent = "בודק מיקומים בפריבוס…";
+      recordCheck(await Promise.allSettled(routes.map(fetchRoute)));
+    });
+  } catch {
+    status.textContent = "הרענון אינו זמין בדפדפן זה.";
+  } finally {
+    pending = false;
+    refreshButton.disabled = false;
+  }
+}
+
+refreshButton.addEventListener("click", check);
+document.addEventListener("visibilitychange", check);
+new IntersectionObserver(check).observe(mapElement);
+setInterval(() => { render(); check(); }, 1000);
+render();
+</script>
+</body>
+</html>
