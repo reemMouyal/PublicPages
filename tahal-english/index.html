@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מילים אנגלית תהל</title>
+  <style>
+    :root {
+      --bg-cream: #f6f1e6;
+      --card-white: #ffffff;
+      --mint-surface: #eaf6ef;
+      --mint-border: #d2eadc;
+      --forest: #1b5e3c;
+      --forest-dark: #14472d;
+      --forest-light: #26754d;
+      --gold: #f4c94e;
+      --gold-soft: #fff7dc;
+      --text-main: #1f2d24;
+      --text-muted: #5a6d61;
+      --border-soft: #e2dfd5;
+      --success-bg: #dcf5e6;
+      --success-border: #258552;
+      --success-text: #16653b;
+      --error-bg: #fdebe8;
+      --error-border: #c44d3c;
+      --error-text: #9e2f20;
+      --shadow-card: 0 10px 28px rgba(27, 94, 60, 0.08);
+      --shadow-btn: 0 2px 6px rgba(27, 94, 60, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Heebo", "Rubik", "Assistant", "Inter", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      background: var(--bg-cream);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.5;
+      padding: 20px 16px 40px;
+    }
+
+    .app-container {
+      max-width: 780px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Safari Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, var(--forest) 0%, var(--forest-dark) 100%);
+      color: #ffffff;
+      border-radius: 22px;
+      padding: 22px 26px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero-text {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 1;
+    }
+
+    .hero-subtitle {
+      color: var(--gold);
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .hero-title {
+      font-size: clamp(1.55rem, 3.2vw, 2.05rem);
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .hero-desc {
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 0.96rem;
+    }
+
+    .hero-art {
+      flex-shrink: 0;
+      width: 152px;
+      height: 94px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .hero-art svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Control Bar */
+    .control-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .mode-tabs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mode-btn {
+      appearance: none;
+      border: 1.5px solid var(--border-soft);
+      background: var(--card-white);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 9px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .mode-btn:hover {
+      border-color: var(--forest);
+      color: var(--forest);
+    }
+
+    .mode-btn.active {
+      background: var(--forest);
+      border-color: var(--forest);
+      color: #ffffff;
+      box-shadow: var(--shadow-btn);
+    }
+
+    .topic-picker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .topic-label {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .topic-select {
+      appearance: none;
+      font-family: inherit;
+      font-size: 0.94rem;
+      font-weight: 600;
+      color: var(--text-main);
+      background-color: var(--card-white);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%231b5e3c' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: left 12px center;
+      border: 1.5px solid var(--border-soft);
+      border-radius: 12px;
+      padding: 9px 14px 9px 34px;
+      cursor: pointer;
+      min-width: 178px;
+      transition: border-color 0.16s ease;
+    }
+
+    .topic-select:focus {
+      outline: none;
+      border-color: var(--forest);
+    }
+
+    /* Main Practice Card */
+    .practice-card {
+      background: var(--card-white);
+      border-radius: 22px;
+      padding: 22px 24px 26px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid rgba(27, 94, 60, 0.07);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .card-header {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.93rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .score-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--gold-soft);
+      color: #7d5b08;
+      border: 1px solid #f0da96;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 7px;
+      background: #e6efe9;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--forest);
+      border-radius: 999px;
+      width: 0%;
+      transition: width 0.25s ease;
+    }
+
+    /* Inner Mint Surface */
+    .mint-stage {
+      background: var(--mint-surface);
+      border: 1px solid var(--mint-border);
+      border-radius: 18px;
+      padding: 28px 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+    }
+
+    .badge-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 24px;
+    }
+
+    .tag-pill {
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: #ffffff;
+      color: var(--forest);
+      border: 1px solid var(--mint-border);
+    }
+
+    .tag-pill.bonus {
+      background: var(--gold-soft);
+      color: #7d5b08;
+      border-color: #eed68b;
+    }
+
+    .word-emoji {
+      font-size: 3rem;
+      line-height: 1.1;
+      user-select: none;
+    }
+
+    .word-en {
+      direction: ltr;
+      unicode-bidi: isolate;
+      font-size: clamp(1.65rem, 4vw, 2.35rem);
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+    }
+
+    .word-he {
+      font-size: clamp(1.45rem, 3.4vw, 2rem);
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .helper-hint {
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      min-height: 28px;
+    }
+
+    .revealed-translation {
+      font-size: clamp(1.35rem, 3vw, 1.75rem);
+      font-weight: 800;
+      color: var(--forest);
+      min-height: 36px;
+      animation: fadeSlide 0.18s ease;
+    }
+
+    @keyframes fadeSlide {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Buttons */
+    .btn {
+      appearance: none;
+      font-family: inherit;
+      font-size: 0.96rem;
+      font-weight: 700;
+      padding: 11px 20px;
+      border-radius: 12px;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: all 0.16s ease;
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--forest);
+      color: #ffffff;
+      box-shadow: var(--shadow-btn);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--forest-light);
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--forest);
+      border-color: var(--mint-border);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #f2f9f5;
+      border-color: var(--forest);
+    }
+
+    .btn-audio {
+      background: #ffffff;
+      color: var(--forest);
+      border: 1.5px solid #bddcc9;
+      padding: 9px 18px;
+      font-size: 0.94rem;
+    }
+
+    .btn-audio:hover {
+      background: #f3fbf6;
+      border-color: var(--forest);
+    }
+
+    .btn-audio.speaking {
+      background: var(--forest);
+      color: #ffffff;
+      border-color: var(--forest);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-actions .btn {
+      flex: 1 1 120px;
+    }
+
+    /* Multiple Choice / Listening Options Grid */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .option-btn {
+      appearance: none;
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 16px 14px;
+      border-radius: 14px;
+      border: 1.5px solid var(--border-soft);
+      background: #ffffff;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .option-btn.ltr-text {
+      direction: ltr;
+      unicode-bidi: isolate;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--forest);
+      background: #f4faf6;
+      transform: translateY(-1px);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background: var(--success-bg);
+      border-color: var(--success-border);
+      color: var(--success-text);
+    }
+
+    .option-btn.wrong {
+      background: var(--error-bg);
+      border-color: var(--error-border);
+      color: var(--error-text);
+    }
+
+    /* Spelling Input Row */
+    .spelling-form {
+      display: flex;
+      align-items: stretch;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .spelling-input {
+      flex: 1;
+      direction: ltr;
+      text-align: left;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      font-size: 1.12rem;
+      font-weight: 600;
+      padding: 13px 16px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border-soft);
+      background: #ffffff;
+      color: var(--text-main);
+      transition: border-color 0.16s ease;
+    }
+
+    .spelling-input:focus {
+      outline: none;
+      border-color: var(--forest);
+    }
+
+    .spelling-input:disabled {
+      background: #f5f5f2;
+    }
+
+    /* Feedback Box */
+    .feedback-area {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      animation: fadeSlide 0.18s ease;
+    }
+
+    .feedback-area.correct {
+      background: var(--success-bg);
+      border: 1px solid #b6e3c9;
+      color: var(--success-text);
+    }
+
+    .feedback-area.wrong {
+      background: var(--error-bg);
+      border: 1px solid #edc3bc;
+      color: var(--error-text);
+    }
+
+    .feedback-msg {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .feedback-en {
+      direction: ltr;
+      unicode-bidi: isolate;
+      font-weight: 800;
+    }
+
+    .feedback-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Summary View */
+    .summary-stage {
+      background: var(--mint-surface);
+      border: 1px solid var(--mint-border);
+      border-radius: 18px;
+      padding: 34px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .summary-stars {
+      font-size: 3rem;
+      line-height: 1;
+    }
+
+    .summary-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--forest-dark);
+    }
+
+    .summary-score {
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .summary-sub {
+      font-size: 0.96rem;
+      color: var(--text-muted);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--forest-dark);
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 100;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 12px 10px 28px;
+      }
+
+      .hero-banner {
+        flex-direction: column-reverse;
+        align-items: stretch;
+        padding: 18px;
+        gap: 14px;
+      }
+
+      .hero-art {
+        width: 100%;
+        height: 82px;
+      }
+
+      .control-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .mode-tabs {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+      }
+
+      .mode-btn {
+        padding: 9px 6px;
+        font-size: 0.88rem;
+      }
+
+      .topic-picker {
+        justify-content: space-between;
+      }
+
+      .topic-select {
+        flex: 1;
+      }
+
+      .practice-card {
+        padding: 16px;
+      }
+
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .spelling-form {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-container">
+    <header class="hero-banner">
+      <div class="hero-text">
+        <div class="hero-subtitle">אנגלית · עמודים 28–29</div>
+        <h1 class="hero-title">מילים אנגלית תהל</h1>
+        <p class="hero-desc">16 מילים וביטויים ב־3 נושאים. בחרי נושא והתחילי לתרגל.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#123d27" />
+              <stop offset="65%" stop-color="#216843" />
+              <stop offset="100%" stop-color="#3c8759" />
+            </linearGradient>
+          </defs>
+          <rect width="220" height="130" fill="url(#skyGrad)" />
+          <circle cx="52" cy="36" r="18" fill="#f4c94e" opacity="0.95" />
+          <circle cx="52" cy="36" r="26" fill="#f4c94e" opacity="0.18" />
+          <path d="M0 98 Q55 72 115 92 T220 84 L220 130 L0 130 Z" fill="#174d31" />
+          <path d="M0 112 Q80 94 155 108 T220 102 L220 130 L0 130 Z" fill="#0f3822" />
+          <!-- Acacia tree silhouette -->
+          <path d="M158 106 L160 66 L142 54 L145 51 L161 60 L165 56 L167 60 L184 52 L186 55 L167 67 L169 106 Z" fill="#0b2818" />
+          <ellipse cx="163" cy="49" rx="34" ry="8.5" fill="#0b2818" />
+          <ellipse cx="144" cy="54" rx="15" ry="5" fill="#0b2818" />
+          <ellipse cx="183" cy="53" rx="16" ry="5.5" fill="#0b2818" />
+        </svg>
+      </div>
+    </header>
+
+    <section class="control-bar" aria-label="בחירת מצב תרגול ונושא">
+      <div class="mode-tabs" role="tablist" aria-label="מצבי תרגול">
+        <button type="button" class="mode-btn active" data-mode="flashcards" role="tab" aria-selected="true">כרטיסיות</button>
+        <button type="button" class="mode-btn" data-mode="choice" role="tab" aria-selected="false">בחירה</button>
+        <button type="button" class="mode-btn" data-mode="listening" role="tab" aria-selected="false">האזנה</button>
+        <button type="button" class="mode-btn" data-mode="spelling" role="tab" aria-selected="false">כתיב</button>
+      </div>
+
+      <div class="topic-picker">
+        <label class="topic-label" for="topicSelect">נושא</label>
+        <select id="topicSelect" class="topic-select" aria-label="בחירת נושא"></select>
+      </div>
+    </section>
+
+    <section id="practiceCard" class="practice-card" aria-live="polite"></section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      const WORDS = [
+        // 11 Main Words (p. 28-29)
+        {
+          id: "take",
+          en: "(to) take",
+          speak: "to take",
+          accepted: ["take", "to take", "(to) take"],
+          he: "לקחת",
+          topic: "main",
+          topicLabel: "מילים עיקריות",
+          emoji: "🤲"
+        },
+        {
+          id: "get-off",
+          en: "get off",
+          speak: "get off",
+          accepted: ["get off", "to get off"],
+          he: "לרדת",
+          topic: "main",
+          topicLabel: "מילים עיקריות",
+          emoji: "🚌"
+        },
+        {
+          id: "get-on",
+          en: "get on",
+          speak: "get on",
+          accepted: ["get on", "to get on"],
+          he: "לעלות",
+          topic: "main",
+          topicLabel: "מילים עיקריות",
+          emoji: "🪜"
+        },
+        {
+          id: "take-a-picture",
+          en: "(to) take a picture",
+          speak: "to take a picture",
+          accepted: ["take a picture", "to take a picture", "(to) take a picture"],
+          he: "לצלם",
+          topic: "main",
+          topicLabel: "מילים עיקריות",
+          emoji: "📸"
+        },
+        {
+          id: "comfortable",
+          en: "comfortable",
+          speak: "comfortable",
+          accepted: ["comfortable"],
+          he: "נוח",
+          topic: "main",
+          topicLabel: "מילים עיקריות",
+          emoji: "🛋️"
+        },
+        {
+          id: "visitor",
+          en: "visitor",
+          speak: "visitor",
+          accepted: ["visitor"],
+          he: "אורח / מבקר",
+          topic: "main",
+          topicLabel: "מילים עיקריות",
+          emoji: "🧳"
+        },
+        {
+          id: "cost",
+          en: "cost",
+          speak: "cost",
+          accepted: ["cost", "to cost"],
+          he: "לעלות (כסף)",
+          topic: "main",
+          topicLabel: "מילים עיקריות",
+          emoji: "💰"
+        },
+        {
+          id: "catch",
+          en: "(to) catch",
+          speak: "to catch",
+          accepted: ["catch", "to catch", "(to) catch"],
+          he: "לתפוס",
+          topic: "main",
+          topicLabel: "מילים עיקריות",
+          emoji: "⚾"
+        },
+        {
+          id: "train",
+          en: "train",
+          speak: "train",
+          accepted: ["train"],
+          he: "רכבת",
+          topic: "main",
+          topicLabel: "מילים עיקריות",
+          emoji: "🚆"
+        },
+        {
+          id: "arrive",
+          en: "(to) arrive",
+          speak: "to arrive",
+          accepted: ["arrive", "to arrive", "(to) arrive"],
+          he: "להגיע",
+          topic: "main",
+          topicLabel: "מילים עיקריות",
+          emoji: "🏁"
+        },
+        {
+          id: "take-care",
+          en: "(to) take care",
+          speak: "to take care",
+          accepted: ["take care", "to take care", "(to) take care"],
+          he: "לשמור על עצמך / לטפל",
+          topic: "main",
+          topicLabel: "מילים עיקריות",
+          emoji: "💚"
+        },
+
+        // 4 Bonus Words
+        {
+          id: "directly",
+          en: "directly",
+          speak: "directly",
+          accepted: ["directly"],
+          he: "ישירות",
+          topic: "bonus",
+          topicLabel: "בונוס",
+          emoji: "➡️"
+        },
+        {
+          id: "take-away",
+          en: "(to) take... away",
+          speak: "to take away",
+          accepted: ["take away", "to take away", "take... away", "take ... away", "(to) take... away", "(to) take away"],
+          he: "לקחת (משהו)",
+          topic: "bonus",
+          topicLabel: "בונוס",
+          emoji: "🥡"
+        },
+        {
+          id: "take-off",
+          en: "(to) take ___ off",
+          speak: "to take off",
+          accepted: ["take off", "to take off", "take ___ off", "take ... off", "(to) take ___ off", "(to) take off"],
+          he: "להוריד",
+          topic: "bonus",
+          topicLabel: "בונוס",
+          emoji: "🧥"
+        },
+        {
+          id: "welcome",
+          en: "welcome",
+          speak: "welcome",
+          accepted: ["welcome"],
+          he: "ברוכים הבאים",
+          topic: "bonus",
+          topicLabel: "בונוס",
+          emoji: "🤗"
+        },
+
+        // 1 Practice Sentence
+        {
+          id: "how-much-does-it-cost",
+          en: "How much does it cost?",
+          speak: "How much does it cost?",
+          accepted: ["how much does it cost?", "how much does it cost"],
+          he: "כמה זה עולה?",
+          topic: "sentence",
+          topicLabel: "משפט",
+          emoji: "🏷️"
+        }
+      ];
+
+      const TOPICS = [
+        { id: "all", label: "כל המילים" },
+        { id: "main", label: "מילים עיקריות" },
+        { id: "bonus", label: "מילות בונוס" },
+        { id: "sentence", label: "משפט לתרגול" }
+      ];
+
+      const state = {
+        mode: "flashcards",
+        topic: "all",
+        // Flashcards state
+        cardIndex: 0,
+        revealed: false,
+        // Quiz state (choice, listening, spelling)
+        quizItems: [],
+        quizIndex: 0,
+        score: 0,
+        answered: false,
+        lastCorrect: false,
+        selectedOptionId: null,
+        currentOptions: [],
+        userTyped: "",
+        finished: false
+      };
+
+      const practiceCard = document.getElementById("practiceCard");
+      const topicSelect = document.getElementById("topicSelect");
+      const modeButtons = Array.from(document.querySelectorAll(".mode-btn"));
+      const toastEl = document.getElementById("toast");
+      let toastTimer = null;
+
+      function getFilteredWords(topicId) {
+        if (topicId === "all") return WORDS.slice();
+        return WORDS.filter((w) => w.topic === topicId);
+      }
+
+      function shuffle(list) {
+        const arr = list.slice();
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      function normalizeAnswer(str) {
+        return str
+          .trim()
+          .toLowerCase()
+          .replace(/[’']/g, "'")
+          .replace(/\s+/g, " ");
+      }
+
+      function showToast(message) {
+        toastEl.textContent = message;
+        toastEl.classList.add("visible");
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toastEl.classList.remove("visible");
+        }, 2200);
+      }
+
+      function speakText(text, btnEl) {
+        if (!("speechSynthesis" in window)) {
+          showToast("השמעת קול אינה נתמכת בדפדפן זה");
+          return;
+        }
+        try {
+          window.speechSynthesis.cancel();
+          const utter = new SpeechSynthesisUtterance(text);
+          utter.lang = "en-US";
+          utter.rate = 0.9;
+          const voices = window.speechSynthesis.getVoices();
+          const enVoice = voices.find((v) => v.lang && v.lang.toLowerCase().startsWith("en-us"))
+            || voices.find((v) => v.lang && v.lang.toLowerCase().startsWith("en"));
+          if (enVoice) utter.voice = enVoice;
+
+          if (btnEl) {
+            btnEl.classList.add("speaking");
+            utter.onend = () => btnEl.classList.remove("speaking");
+            utter.onerror = () => btnEl.classList.remove("speaking");
+          }
+          window.speechSynthesis.speak(utter);
+        } catch (err) {
+          showToast("לא ניתן להשמיע כרגע");
+        }
+      }
+
+      function populateTopics() {
+        topicSelect.innerHTML = "";
+        TOPICS.forEach((t) => {
+          const count = getFilteredWords(t.id).length;
+          const opt = document.createElement("option");
+          opt.value = t.id;
+          opt.textContent = `${t.label} (${count})`;
+          topicSelect.appendChild(opt);
+        });
+        topicSelect.value = state.topic;
+      }
+
+      function buildOptionsFor(correctItem) {
+        const topicPool = getFilteredWords(state.topic).filter((w) => w.id !== correctItem.id);
+        const fallbackPool = WORDS.filter(
+          (w) => w.id !== correctItem.id && !topicPool.some((t) => t.id === w.id)
+        );
+        const distractors = shuffle(topicPool).concat(shuffle(fallbackPool)).slice(0, 3);
+        return shuffle([correctItem, ...distractors]);
+      }
+
+      function startMode(newMode) {
+        state.mode = newMode;
+        modeButtons.forEach((btn) => {
+          const isActive = btn.dataset.mode === newMode;
+          btn.classList.toggle("active", isActive);
+          btn.setAttribute("aria-selected", isActive ? "true" : "false");
+        });
+        resetCurrentSession();
+      }
+
+      function resetCurrentSession() {
+        const pool = getFilteredWords(state.topic);
+        if (state.mode === "flashcards") {
+          state.cardIndex = 0;
+          state.revealed = false;
+        } else {
+          const roundLength = Math.min(10, pool.length);
+          state.quizItems = shuffle(pool).slice(0, roundLength);
+          state.quizIndex = 0;
+          state.score = 0;
+          state.answered = false;
+          state.lastCorrect = false;
+          state.selectedOptionId = null;
+          state.userTyped = "";
+          state.finished = false;
+          if (state.quizItems.length > 0 && (state.mode === "choice" || state.mode === "listening")) {
+            state.currentOptions = buildOptionsFor(state.quizItems[0]);
+          } else {
+            state.currentOptions = [];          }
+        }
+        render();
+      }
+
+      function renderFlashcards() {
+        const pool = getFilteredWords(state.topic);
+        const total = pool.length;
+        const item = pool[state.cardIndex];
+        const pct = total > 0 ? ((state.cardIndex + 1) / total) * 100 : 0;
+
+        practiceCard.innerHTML = "";
+
+        const header = document.createElement("div");
+        header.className = "card-header";
+        header.innerHTML = `
+          <div class="status-row">
+            <span>כרטיס ${state.cardIndex + 1} מתוך ${total}</span>
+            <span>${item.topicLabel}</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: ${pct}%"></div>
+          </div>
+        `;
+        practiceCard.appendChild(header);
+
+        const stage = document.createElement("div");
+        stage.className = "mint-stage";
+
+        const badgeRow = document.createElement("div");
+        badgeRow.className = "badge-row";
+        if (item.topic === "bonus" || item.topic === "sentence") {
+          const pill = document.createElement("span");
+          pill.className = "tag-pill" + (item.topic === "bonus" ? " bonus" : "");
+          pill.textContent = item.topic === "bonus" ? "⭐ בונוס" : "💬 משפט לתרגול";
+          badgeRow.appendChild(pill);
+        }
+        stage.appendChild(badgeRow);
+
+        const emojiEl = document.createElement("div");
+        emojiEl.className = "word-emoji";
+        emojiEl.textContent = item.emoji;
+        stage.appendChild(emojiEl);
+
+        const enEl = document.createElement("div");
+        enEl.className = "word-en";
+        enEl.textContent = item.en;
+        stage.appendChild(enEl);
+
+        if (state.revealed) {
+          const heEl = document.createElement("div");
+          heEl.className = "revealed-translation";
+          heEl.textContent = item.he;
+          stage.appendChild(heEl);
+        } else {
+          const hintEl = document.createElement("p");
+          hintEl.className = "helper-hint";
+          hintEl.textContent = "נסי להיזכר בתרגום לפני שאת מגלה אותו.";
+          stage.appendChild(hintEl);
+        }
+
+        const audioBtn = document.createElement("button");
+        audioBtn.type = "button";
+        audioBtn.className = "btn btn-audio";
+        audioBtn.textContent = "🔊 השמעה";
+        audioBtn.addEventListener("click", () => speakText(item.speak, audioBtn));
+        stage.appendChild(audioBtn);
+
+        practiceCard.appendChild(stage);
+
+        const nav = document.createElement("div");
+        nav.className = "nav-actions";
+
+        const prevBtn = document.createElement("button");
+        prevBtn.type = "button";
+        prevBtn.className = "btn btn-secondary";
+        prevBtn.textContent = "הקודם";
+        prevBtn.disabled = total <= 1;
+        prevBtn.addEventListener("click", () => {
+          state.cardIndex = (state.cardIndex - 1 + total) % total;
+          state.revealed = false;
+          render();
+        });
+
+        const revealBtn = document.createElement("button");
+        revealBtn.type = "button";
+        revealBtn.className = "btn btn-secondary";
+        revealBtn.textContent = state.revealed ? "הסתרת תרגום" : "גילוי תרגום";
+        revealBtn.addEventListener("click", () => {
+          state.revealed = !state.revealed;
+          render();
+        });
+
+        const nextBtn = document.createElement("button");
+        nextBtn.type = "button";
+        nextBtn.className = "btn btn-primary";
+        nextBtn.textContent = "הבא";
+        nextBtn.disabled = total <= 1;
+        nextBtn.addEventListener("click", () => {
+          state.cardIndex = (state.cardIndex + 1) % total;
+          state.revealed = false;
+          render();
+        });
+
+        nav.appendChild(prevBtn);
+        nav.appendChild(revealBtn);
+        nav.appendChild(nextBtn);
+        practiceCard.appendChild(nav);
+      }
+
+      function renderQuizHeader(total) {
+        const currentNum = Math.min(state.quizIndex + 1, total);
+        const pct = total > 0 ? (currentNum / total) * 100 : 0;
+        const header = document.createElement("div");
+        header.className = "card-header";
+        header.innerHTML = `
+          <div class="status-row">
+            <span>שאלה ${currentNum} מתוך ${total}</span>
+            <span class="score-pill">⭐ ${state.score} נכונות</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: ${pct}%"></div>
+          </div>
+        `;
+        return header;
+      }
+
+      function renderFeedback(item) {
+        const fb = document.createElement("div");
+        fb.className = "feedback-area " + (state.lastCorrect ? "correct" : "wrong");
+
+        const msg = document.createElement("div");
+        msg.className = "feedback-msg";
+        if (state.lastCorrect) {
+          msg.innerHTML = `<span>✓ מעולה!</span> <span class="feedback-en">${item.en}</span> <span>· ${item.he}</span>`;
+        } else {
+          msg.innerHTML = `<span>הפעם התשובה היא</span> <span class="feedback-en">${item.en}</span> <span>· ${item.he}</span>`;
+        }
+        fb.appendChild(msg);
+
+        const actions = document.createElement("div");
+        actions.className = "feedback-actions";
+
+        const listenBtn = document.createElement("button");
+        listenBtn.type = "button";
+        listenBtn.className = "btn btn-audio";
+        listenBtn.textContent = "🔊 שמיעת התשובה";
+        listenBtn.addEventListener("click", () => speakText(item.speak, listenBtn));
+
+        const nextBtn = document.createElement("button");
+        nextBtn.type = "button";
+        nextBtn.className = "btn btn-primary";
+        const isLast = state.quizIndex + 1 >= state.quizItems.length;
+        nextBtn.textContent = isLast ? "לסיכום" : "המשך";
+        nextBtn.addEventListener("click", advanceQuiz);
+
+        actions.appendChild(listenBtn);
+        actions.appendChild(nextBtn);
+        fb.appendChild(actions);
+
+        return fb;
+      }
+
+      function advanceQuiz() {
+        if (state.quizIndex + 1 >= state.quizItems.length) {
+          state.finished = true;
+          render();
+          return;
+        }
+        state.quizIndex += 1;
+        state.answered = false;
+        state.lastCorrect = false;
+        state.selectedOptionId = null;
+        state.userTyped = "";
+        if (state.mode === "choice" || state.mode === "listening") {
+          state.currentOptions = buildOptionsFor(state.quizItems[state.quizIndex]);
+        }
+        render();
+        if (state.mode === "listening") {
+          speakText(state.quizItems[state.quizIndex].speak);
+        }
+      }
+
+      function renderSummary() {
+        const total = state.quizItems.length;
+        const ratio = total > 0 ? state.score / total : 0;
+        let title = "כל הכבוד!";
+        let stars = "🌟";
+        let sub = "תרגול נהדר — אפשר לנסות שוב או לעבור למצב תרגול אחר.";
+
+        if (ratio === 1) {
+          title = "מושלם! ענית על הכול נכון!";
+          stars = "🏆";
+          sub = "שליטה מצוינת בכל המילים שבתרגול.";
+        } else if (ratio >= 0.7) {
+          title = "עבודה מעולה!";
+          stars = "⭐";
+          sub = "כמעט הכול נכון — עוד סבב קצר וזה יושב מצוין.";
+        } else {
+          title = "התחלה טובה!";
+          stars = "💪";
+          sub = "כדאי לחזור רגע לכרטיסיות ואז לנסות שוב.";
+        }
+
+        practiceCard.innerHTML = "";
+        const box = document.createElement("div");
+        box.className = "summary-stage";
+        box.innerHTML = `
+          <div class="summary-stars">${stars}</div>
+          <h2 class="summary-title">${title}</h2>
+          <p class="summary-score">⭐ ${state.score} נכונות מתוך ${total}</p>
+          <p class="summary-sub">${sub}</p>
+        `;
+
+        const restartBtn = document.createElement("button");
+        restartBtn.type = "button";
+        restartBtn.className = "btn btn-primary";
+        restartBtn.textContent = "תרגול חדש";
+        restartBtn.addEventListener("click", resetCurrentSession);
+        box.appendChild(restartBtn);
+
+        practiceCard.appendChild(box);
+      }
+
+      function renderChoice() {
+        if (state.finished) {
+          renderSummary();
+          return;
+        }
+        const total = state.quizItems.length;
+        const item = state.quizItems[state.quizIndex];
+
+        practiceCard.innerHTML = "";
+        practiceCard.appendChild(renderQuizHeader(total));
+
+        const stage = document.createElement("div");
+        stage.className = "mint-stage";
+
+        const emojiEl = document.createElement("div");
+        emojiEl.className = "word-emoji";
+        emojiEl.textContent = item.emoji;
+        stage.appendChild(emojiEl);
+
+        const heEl = document.createElement("div");
+        heEl.className = "word-he";
+        heEl.textContent = item.he;
+        stage.appendChild(heEl);
+
+        const hintEl = document.createElement("p");
+        hintEl.className = "helper-hint";
+        hintEl.textContent = "בחרי את התרגום באנגלית.";
+        stage.appendChild(hintEl);
+
+        practiceCard.appendChild(stage);
+
+        const grid = document.createElement("div");
+        grid.className = "options-grid";
+
+        state.currentOptions.forEach((opt) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "option-btn ltr-text";
+          btn.textContent = opt.en;
+          btn.disabled = state.answered;
+
+          if (state.answered) {
+            if (opt.id === item.id) {
+              btn.classList.add("correct");
+            } else if (opt.id === state.selectedOptionId) {
+              btn.classList.add("wrong");
+            }
+          } else {
+            btn.addEventListener("click", () => {
+              state.answered = true;
+              state.selectedOptionId = opt.id;
+              state.lastCorrect = opt.id === item.id;
+              if (state.lastCorrect) state.score += 1;
+              render();
+            });
+          }
+
+          grid.appendChild(btn);
+        });
+
+        practiceCard.appendChild(grid);
+
+        if (state.answered) {
+          practiceCard.appendChild(renderFeedback(item));
+        }
+      }
+
+      function renderListening() {
+        if (state.finished) {
+          renderSummary();
+          return;
+        }
+        const total = state.quizItems.length;
+        const item = state.quizItems[state.quizIndex];
+
+        practiceCard.innerHTML = "";
+        practiceCard.appendChild(renderQuizHeader(total));
+
+        const stage = document.createElement("div");
+        stage.className = "mint-stage";
+
+        const titleEl = document.createElement("div");
+        titleEl.className = "word-he";
+        titleEl.textContent = "מה שמעת?";
+        stage.appendChild(titleEl);
+
+        const hintEl = document.createElement("p");
+        hintEl.className = "helper-hint";
+        hintEl.textContent = "לחצי על הכפתור ובחרי את הפירוש בעברית.";
+        stage.appendChild(hintEl);
+
+        const audioBtn = document.createElement("button");
+        audioBtn.type = "button";
+        audioBtn.className = "btn btn-audio";
+        audioBtn.textContent = "🔊 השמעה";
+        audioBtn.addEventListener("click", () => speakText(item.speak, audioBtn));
+        stage.appendChild(audioBtn);
+
+        practiceCard.appendChild(stage);
+
+        const grid = document.createElement("div");
+        grid.className = "options-grid";
+
+        state.currentOptions.forEach((opt) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "option-btn";
+          btn.textContent = opt.he;
+          btn.disabled = state.answered;
+
+          if (state.answered) {
+            if (opt.id === item.id) {
+              btn.classList.add("correct");
+            } else if (opt.id === state.selectedOptionId) {
+              btn.classList.add("wrong");
+            }
+          } else {
+            btn.addEventListener("click", () => {
+              state.answered = true;
+              state.selectedOptionId = opt.id;
+              state.lastCorrect = opt.id === item.id;
+              if (state.lastCorrect) state.score += 1;
+              render();
+            });
+          }
+
+          grid.appendChild(btn);
+        });
+
+        practiceCard.appendChild(grid);
+
+        if (state.answered) {
+          practiceCard.appendChild(renderFeedback(item));
+        }
+      }
+
+      function renderSpelling() {
+        if (state.finished) {
+          renderSummary();
+          return;
+        }
+        const total = state.quizItems.length;
+        const item = state.quizItems[state.quizIndex];
+
+        practiceCard.innerHTML = "";
+        practiceCard.appendChild(renderQuizHeader(total));
+
+        const stage = document.createElement("div");
+        stage.className = "mint-stage";
+
+        const emojiEl = document.createElement("div");
+        emojiEl.className = "word-emoji";
+        emojiEl.textContent = item.emoji;
+        stage.appendChild(emojiEl);
+
+        const heEl = document.createElement("div");
+        heEl.className = "word-he";
+        heEl.textContent = item.he;
+        stage.appendChild(heEl);
+
+        const hintEl = document.createElement("p");
+        hintEl.className = "helper-hint";
+        hintEl.textContent = "כתבי באנגלית.";
+        stage.appendChild(hintEl);
+
+        practiceCard.appendChild(stage);
+
+        const form = document.createElement("form");
+        form.className = "spelling-form";
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          if (state.answered) {
+            advanceQuiz();
+            return;
+          }
+          const raw = inputEl.value;
+          if (!raw.trim()) {
+            showToast("כתבי תשובה באנגלית לפני הבדיקה");
+            inputEl.focus();
+            return;
+          }
+          state.userTyped = raw;
+          const normalized = normalizeAnswer(raw);
+          const isMatch = item.accepted.some((acc) => normalizeAnswer(acc) === normalized);
+          state.answered = true;
+          state.lastCorrect = isMatch;
+          if (isMatch) state.score += 1;
+          render();
+        });
+
+        const inputEl = document.createElement("input");
+        inputEl.type = "text";
+        inputEl.className = "spelling-input";
+        inputEl.placeholder = "Type in English";
+        inputEl.autocomplete = "off";
+        inputEl.autocapitalize = "off";
+        inputEl.spellcheck = false;
+        inputEl.value = state.userTyped;
+        inputEl.disabled = state.answered;
+
+        const checkBtn = document.createElement("button");
+        checkBtn.type = "submit";
+        checkBtn.className = "btn btn-primary";
+        checkBtn.textContent = "בדיקה";
+        checkBtn.disabled = state.answered;
+
+        form.appendChild(inputEl);
+        form.appendChild(checkBtn);
+        practiceCard.appendChild(form);
+
+        if (state.answered) {
+          practiceCard.appendChild(renderFeedback(item));
+        } else {
+          setTimeout(() => inputEl.focus(), 0);
+        }
+      }
+
+      function render() {
+        if (state.mode === "flashcards") {
+          renderFlashcards();
+        } else if (state.mode === "choice") {
+          renderChoice();
+        } else if (state.mode === "listening") {
+          renderListening();
+        } else if (state.mode === "spelling") {
+          renderSpelling();
+        }
+      }
+
+      // Wire top controls
+      modeButtons.forEach((btn) => {
+        btn.addEventListener("click", () => startMode(btn.dataset.mode));
+      });
+
+      topicSelect.addEventListener("change", () => {
+        state.topic = topicSelect.value;
+        resetCurrentSession();
+      });
+
+      // Keyboard navigation for flashcards and spelling Enter-to-continue
+      document.addEventListener("keydown", (e) => {
+        if (state.mode === "flashcards") {
+          const pool = getFilteredWords(state.topic);
+          if (pool.length === 0) return;
+          if (e.key === " " || e.key === "Enter") {
+            if (document.activeElement && document.activeElement.tagName === "BUTTON") return;
+            e.preventDefault();
+            state.revealed = !state.revealed;
+            render();
+          } else if (e.key === "ArrowLeft" && pool.length > 1) {
+            state.cardIndex = (state.cardIndex + 1) % pool.length;
+            state.revealed = false;
+            render();
+          } else if (e.key === "ArrowRight" && pool.length > 1) {
+            state.cardIndex = (state.cardIndex - 1 + pool.length) % pool.length;
+            state.revealed = false;
+            render();
+          }
+        } else if (state.mode === "spelling" && state.answered && e.key === "Enter") {
+          e.preventDefault();
+          advanceQuiz();
+        }
+      });
+
+      // Preload voices if supported
+      if ("speechSynthesis" in window && typeof window.speechSynthesis.onvoiceschanged !== "undefined") {
+        window.speechSynthesis.onvoiceschanged = () => {
+          window.speechSynthesis.getVoices();
+        };
+      }
+
+      populateTopics();
+      render();
+    })();
+  </script>
+</body>
+</html>
