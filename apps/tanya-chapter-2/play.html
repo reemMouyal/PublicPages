@@ -7,6 +7,11 @@
 <title>תניא בעל פה · פרק ב׳</title>
 <style>
 :root{color-scheme:light;--ink:#172e2a;--green:#205547;--light:#e7efe6;--paper:#fffdf7;--line:#d9e1d6;--muted:#52665f;--gold:#e6ba60}*{box-sizing:border-box}body{margin:0;background:#f3f2e8;color:var(--ink);font:16px system-ui,Arial,sans-serif}main{max-width:1000px;margin:auto;padding:26px 18px 36px}header{background:#173c34;color:#fffdf6;border-radius:24px;padding:clamp(24px,5vw,48px);position:relative;overflow:hidden}header::after{content:"ב";position:absolute;left:6%;top:-38%;font:bold clamp(150px,35vw,340px) Georgia,serif;color:#fff1;pointer-events:none}header p{margin:0 0 7px;color:#f3cf82}h1{font-size:clamp(36px,7vw,63px);margin:0;letter-spacing:-.045em}header div{margin-top:10px;max-width:34ch;line-height:1.55}.layout{display:grid;grid-template-columns:minmax(0,1fr) 245px;gap:16px;margin-top:18px;align-items:start}.card,aside{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:clamp(15px,3vw,25px)}aside h2{font-size:19px;margin:0 0 5px}aside p,.small{font-size:14px;color:var(--muted);margin:0}progress{width:100%;height:12px;accent-color:var(--green);margin:12px 0}label{display:block;font-weight:700;margin:8px 0 5px}select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--ink);font:inherit}.tabs,.actions,.navigation,.choices{display:flex;gap:8px;flex-wrap:wrap}.tabs{margin:16px 0}.top{display:flex;justify-content:space-between;gap:10px;align-items:center}.top h2{margin:0;font-size:22px}button{font:inherit;font-weight:650;color:var(--green);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-height:44px;cursor:pointer}button:hover{background:var(--light)}button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #9c6117;outline-offset:2px}button.primary,button[aria-pressed=true]{background:var(--green);border-color:var(--green);color:white}button:disabled{opacity:.5;cursor:default}button.blank{display:inline;vertical-align:middle;border:0;border-bottom:2px solid var(--green);border-radius:6px;background:var(--light);padding:0 12px;min-width:68px;font:inherit;font-weight:700}button.solved{background:#d9ecda;border-color:#51885f}.reading{background:#f0f3e9;border-radius:14px;padding:clamp(15px,3vw,25px);font-family:"Times New Roman",serif;font-size:clamp(24px,4vw,33px);line-height:1.65;margin:10px 0 12px;min-height:126px;overflow-wrap:anywhere}.reading p{margin:0 0 .65em}.reading p:last-child{margin:0}.reading small{font:16px system-ui}.actions{margin-top:10px}.navigation{justify-content:space-between;margin-top:17px;border-top:1px solid var(--line);padding-top:12px}.choices{margin-top:9px}.status{min-height:25px;margin:8px 0 0;color:var(--green);font-weight:650}.source{margin:16px 0 0;font-size:14px}.source a{color:var(--green)}[hidden]{display:none!important}@media(max-width:680px){main{padding:12px}.layout{grid-template-columns:1fr}aside{grid-row:1}.top h2{font-size:19px}header{border-radius:18px}}
+
+.song{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.song h3{margin:0 0 8px;font-size:19px}.song audio{display:block;width:100%;margin:12px 0}
+.song .repeat{display:flex;align-items:center;gap:7px;margin:0;font-weight:500}
+.song .repeat input{width:19px;height:19px;accent-color:var(--green)}
 </style>
 </head>
 <body>
@@ -24,7 +29,6 @@
 <div id="reading" class="reading"></div>
 <div id="choices" class="choices" aria-label="אפשרויות להשלמה"></div>
 <div class="actions">
-<button id="listen">השמעה</button>
 <button id="hint" hidden>עוד רמז</button>
 <button id="reveal" hidden>הצגת הנוסח</button>
 <button id="master" class="primary" hidden>דקלמתי בלי עזרה</button>
@@ -32,6 +36,19 @@
 </div>
 <p id="status" class="status" role="status"></p>
 <div class="navigation"><button id="prev">המקטע הקודם</button><button id="next">המקטע הבא</button></div>
+
+<section class="song" aria-labelledby="songTitle">
+<h3 id="songTitle">שומעים ושרים</h3>
+<p class="small">שמע את המילים של המקטע שמופיע למעלה ושיר איתו.</p>
+<p class="small" id="songLabel"></p>
+<audio id="songAudio" controls preload="none" aria-label="הקלטת פרק ב׳"></audio>
+<div class="actions">
+<button id="playPart" class="primary">נגן את המקטע</button>
+<button id="playAll">נגן את כל השיר</button>
+<label class="repeat"><input type="checkbox" id="songLoop"> חזרה על הקטע</label>
+</div>
+<p id="songStatus" class="small" role="status"></p>
+</section>
 </section>
 <aside>
 <h2>ההתקדמות שלי</h2><p id="progressLabel"></p>
@@ -80,6 +97,7 @@
 אבל הנשמה עצמה, הנה לפעמים נשמת אדם גבוה לאין קץ, בא להיות בנו של אדם נבזה ושפל כו',
 כמו שכתב האר"י זכרונו לברכה כל זה ב"ליקוטי תורה" פרשת וירא ובטעמי מצות פרשת בראשית:
 </script>
+<script id="songClips" type="application/json">{"parts":["audio/part-01.mp3","audio/part-02.mp3","audio/part-03.mp3","audio/part-04.mp3","audio/part-05.mp3","audio/part-06.mp3","audio/part-07.mp3","audio/part-08.mp3","audio/part-09.mp3","audio/part-10.mp3","audio/part-11.mp3","audio/part-12.mp3","audio/part-13.mp3","audio/part-14.mp3","audio/part-15.mp3","audio/part-16.mp3","audio/part-17.mp3","audio/part-18.mp3","audio/part-19.mp3","audio/part-20.mp3","audio/part-21.mp3","audio/part-22.mp3","audio/part-23.mp3","audio/part-24.mp3","audio/part-25.mp3","audio/part-26.mp3","audio/part-27.mp3","audio/part-28.mp3","audio/part-29.mp3","audio/part-30.mp3","audio/part-31.mp3","audio/part-32.mp3","audio/part-33.mp3","audio/part-34.mp3","audio/part-35.mp3","audio/part-36.mp3"],"whole":"audio/chapter.mp3"}</script>
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
@@ -104,7 +122,7 @@ function shuffle(values) {
   return shuffled;
 }
 function resetExercise() {
-  window.speechSynthesis?.cancel();
+  selectCurrentAudio();
   revealed = false; hints = 0; active = null;
   words = chapter[index].split(' ');
   const candidates = words.map((word, i) => [i, normalize(word)]).filter(([i, word]) => i > 0 && word.length >= 3).map(([i]) => i);
@@ -126,7 +144,6 @@ function render() {
   $('fillTab').disabled = review;
   $('prev').disabled = review || index === 0;
   $('next').disabled = review || index === chapter.length - 1;
-  $('listen').hidden = mode !== 'read';
   $('hint').hidden = mode !== 'say' || revealed || (review ? hints >= chapter.length : hints >= words.length - 1);
   $('reveal').hidden = mode !== 'say' || revealed;
   $('retry').hidden = mode === 'read' || (mode === 'say' && !revealed && !hints);
@@ -201,20 +218,49 @@ $('hint').onclick = () => { hints = review ? hints + 1 : Math.min(words.length-1
 $('reveal').onclick = () => { revealed = true; render(); $('retry').focus(); };
 $('retry').onclick = resetExercise;
 $('master').onclick = () => { mastered.add(index); save(); render(); message(mastered.size === chapter.length ? 'כל הכבוד! דקלמת את כל המקטעים.' : 'המקטע סומן. אפשר להמשיך למקטע הבא.'); };
-$('listen').onclick = () => {
-  if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) { message('הדפדפן הזה אינו תומך בהשמעה.'); return; }
-  const synth = window.speechSynthesis;
-  if (synth.speaking || synth.pending) { synth.cancel(); message(''); return; }
-  const voice = synth.getVoices().find(voice => /^he(?:-|_|$)/i.test(voice.lang) || /^iw(?:-|_|$)/i.test(voice.lang));
-  if (!voice) { message('כדי להשמיע, צריך להפעיל קול בעברית בהגדרות המכשיר.'); return; }
-  const utterance = new SpeechSynthesisUtterance(review ? chapter.join(' ') : chapter[index]);
-  utterance.voice = voice; utterance.lang = voice.lang; utterance.rate = .8;
-  utterance.onend = () => message('');
-  utterance.onerror = event => { if (!['canceled','interrupted'].includes(event.error)) message('ההשמעה לא הצליחה.'); };
-  synth.speak(utterance);
-  message('ההשמעה פועלת. לחץ שוב כדי לעצור.');
+
+const recordings = JSON.parse($('songClips').textContent);
+const player = $('songAudio');
+const loop = $('songLoop');
+let loadedRecording;
+function loadRecording(url, repeat) {
+  player.pause();
+  player.loop = repeat && loop.checked;
+  if (loadedRecording !== url) {
+    loadedRecording = url;
+    player.src = url;
+  } else {
+    player.currentTime = 0;
+  }
+  $('songStatus').textContent = '';
+}
+function selectCurrentAudio() {
+  const isChapter = review;
+  $('songLabel').textContent = isChapter ? 'ההקלטה המלאה' : 'מקטע ' + (index + 1) + ' · ' + topic(index);
+  $('playPart').hidden = isChapter;
+  loop.disabled = isChapter;
+  loadRecording(isChapter ? recordings.whole : recordings.parts[index], !isChapter);
+}
+function startRecording(url, repeat) {
+  loadRecording(url, repeat);
+  player.play().catch(error => {
+    if (error.name !== 'AbortError') $('songStatus').textContent = 'לחץ על כפתור הניגון בנגן כדי להמשיך.';
+  });
+}
+$('playPart').onclick = () => {
+  $('songLabel').textContent = 'מקטע ' + (index + 1) + ' · ' + topic(index);
+  loop.disabled = false;
+  startRecording(recordings.parts[index], true);
 };
-window.speechSynthesis?.getVoices();
+$('playAll').onclick = () => {
+  $('songLabel').textContent = 'ההקלטה המלאה';
+  loop.disabled = true;
+  startRecording(recordings.whole, false);
+};
+loop.onchange = () => { player.loop = loop.checked && !loop.disabled; };
+player.addEventListener('error', () => {
+  $('songStatus').textContent = 'טעינת ההקלטה נכשלה. בחר מקטע ונסה שוב.';
+});
 resetExercise();
 </script>
 </body>
